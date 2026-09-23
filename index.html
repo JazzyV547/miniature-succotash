@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aramex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #ffffff;
+      color: #1f2937;
+    }
+    .page {
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      background: #fff;
+      min-height: 100vh;
+    }
+
+    /* ========== HEADER ========== */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .logo img { height: 24px; display: block; }
+    .logo p { font-size: 9px; color: #6b7280; margin-top: -2px; letter-spacing: 0.4px; }
+    .header-btns { display: flex; gap: 8px; }
+    .header-btns button {
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .hamburger-row {
+      padding: 6px 16px 10px;
+    }
+    .hamburger-row button {
+      background: none;
+      border: none;
+      color: #DC291E;
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* ========== HERO ========== */
+    .hero { padding: 0 16px; }
+    .hero img {
+      width: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ========== TRACK ========== */
+    .track-section { padding: 28px 16px 0; }
+    .track-section h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #DC291E;
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+    .track-box {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .track-box .icon {
+      padding-left: 14px;
+      color: #DC291E;
+    }
+    .track-box input {
+      flex: 1;
+      border: none;
+      padding: 14px 12px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    .track-box button {
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .track-note {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+    .track-note span { color: #DC291E; font-weight: 500; }
+
+    /* ========== QUICK CARDS ========== */
+    .quick-cards { padding: 24px 16px; }
+    .quick-card {
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .quick-card.red {
+      background: #DC291E;
+      color: #fff;
+    }
+    .quick-card.white {
+      background: #fff;
+      border: 1px solid #f3f4f6;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .quick-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .quick-card.white h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .quick-card p {
+      font-size: 13.5px;
+      line-height: 1.4;
+      opacity: 0.95;
+    }
+    .quick-card.white p { color: #6b7280; font-size: 13px; }
+    .quick-card .icon-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .quick-card .icon-wrap svg,
+    .quick-card .icon-wrap img {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* ========== DELIVERY UNLIMITED ========== */
+    .unlimited {
+      padding: 48px 16px 24px;
+      text-align: center;
+    }
+    .unlimited h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 40px;
+    }
+    .unlimited-item { margin-bottom: 44px; }
+    .unlimited-item img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      display: block;
+    }
+    .unlimited-item h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+    .unlimited-item p {
+      font-size: 13.5px;
+      color: #6b7280;
+      line-height: 1.5;
+      padding: 0 4px;
+    }
+
+    /* ========== SERVICES ========== */
+    .services { padding: 16px 16px 8px; }
+    .service-card {
+      border: 1px solid #f3f4f6;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .service-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .service-top h3 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #6b7280;
+      line-height: 1;
+    }
+    .service-line {
+      width: 48px;
+      height: 3px;
+      margin: 6px 0 4px;
+    }
+    .service-line.red { background: #DC291E; }
+    .service-line.yellow { background: #eab308; }
+    .service-line.teal { background: #0d9488; }
+    .service-top p {
+      font-size: 20px;
+      color: #6b7280;
+    }
+    .service-btn {
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .service-btn.red { background: #DC291E; }
+    .service-btn.yellow { background: #eab308; }
+    .service-btn.teal { background: #0d9488; }
+    .service-card > p {
+      font-size: 13.5px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    /* ========== SHOP & SHIP ========== */
+    .shop-ship {
+      padding: 48px 16px;
+      text-align: center;
+    }
+    .shop-badge {
+      display: inline-block;
+      background: #312e81;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 4px 12px;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+    }
+    .shop-badge span { color: #facc15; }
+    .shop-ship h2 {
+      font-size: 23px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .shop-ship p {
+      font-size: 13.5px;
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .shop-ship .btn {
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 12px 40px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ========== DOWNLOAD APP ========== */
+    .download {
+      padding: 40px 16px;
+      text-align: center;
+    }
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      background: #DC291E;
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .download h2 {
+      font-size: 23px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 32px;
+    }
+    .app-features {
+      text-align: left;
+      max-width: 260px;
+      margin: 0 auto 32px;
+    }
+    .app-feature {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .app-feature .icon { color: #DC291E; margin-top: 2px; }
+    .app-feature p:first-child {
+      font-weight: 600;
+      font-size: 15px;
+      color: #111;
+    }
+    .app-feature p:last-child {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .stars {
+      color: #facc15;
+      font-size: 22px;
+      letter-spacing: 4px;
+      margin-bottom: 4px;
+    }
+    .reviews {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+    .store-btns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .store-btn {
+      background: #000;
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      min-width: 160px;
+    }
+    .store-btn .small { font-size: 9px; opacity: 0.8; }
+    .store-btn .big { font-weight: 600; font-size: 13px; }
+    .app-preview {
+      max-width: 280px;
+      margin: 32px auto 0;
+      display: block;
+      border-radius: 12px;
+    }
+
+    /* ========== GET IN TOUCH ========== */
+    .get-touch { padding: 48px 16px; }
+    .get-touch h2 {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #111827;
+      margin-bottom: 32px;
+    }
+    .touch-card {
+      border: 1px solid #f3f4f6;
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .touch-card img {
+      height: 44px;
+      width: 44px;
+      margin: 0 auto 12px;
+      display: block;
+      object-fit: contain;
+    }
+    .touch-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .touch-card p {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    /* ========== LATEST TRENDS ========== */
+    .trends {
+      padding: 40px 16px;
+      background: #f9fafb;
+    }
+    .trends h2 {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #111827;
+      margin-bottom: 28px;
+    }
+    .trend-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .trend-card img {
+      width: 100%;
+      height: 176px;
+      object-fit: cover;
+      display: block;
+    }
+    .trend-card .info { padding: 16px; }
+    .trend-card h3 {
+      font-size: 15.5px;
+      font-weight: 600;
+      color: #111827;
+      line-height: 1.35;
+    }
+    .trend-card p {
+      font-size: 12.5px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    /* ========== HOW CAN WE HELP ========== */
+    .help-form { padding: 48px 16px; }
+    .help-form h2 {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+    .help-form .sub {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+    .help-form .sub span { color: #DC291E; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    .form-group label span { color: #DC291E; }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      background: #fff;
+    }
+    .phone-row {
+      display: flex;
+      gap: 8px;
+    }
+    .phone-row .code {
+      display: flex;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0 12px;
+      background: #f9fafb;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .checkbox-row input { margin-top: 3px; }
+    .checkbox-row span { color: #DC291E; }
+    .recaptcha {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .recaptcha .right {
+      margin-left: auto;
+      font-size: 10px;
+      color: #9ca3af;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 500;
+      margin-top: 20px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .help-image {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .help-image img {
+      max-width: 280px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .awards {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      opacity: 0.8;
+    }
+    .awards img { height: 48px; object-fit: contain; }
+
+    /* ========== FIND US ========== */
+    .find-us {
+      padding: 48px 16px;
+      text-align: center;
+    }
+    .find-us h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .find-us p {
+      font-size: 13.5px;
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+    .find-us .btn {
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 32px;
+      font-family: inherit;
+    }
+    .find-us img {
+      max-width: 100%;
+      opacity: 0.7;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .footer-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .footer-logo img { height: 36px; }
+    .footer-links .link-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #374151;
+      padding: 14px 0;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .footer-links .link-row:hover { background: rgba(255,255,255,0.05); }
+    .footer-links .link-row span:first-child { color: #ef4444; }
+    .footer-links .link-row span:last-child { color: #9ca3af; transition: transform 0.25s; }
+    .footer-links .link-row.open span:last-child { transform: rotate(180deg); }
+    .footer-sub {
+      display: none;
+      padding: 8px 0 12px 8px;
+      border-bottom: 1px solid #374151;
+    }
+    .footer-sub.show { display: block; }
+    .footer-sub a {
+      display: block;
+      color: #d1d5db;
+      font-size: 13px;
+      padding: 8px 0;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-sub a:hover { color: #fff; }
+    .socials {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-top: 32px;
+    }
+    .socials a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      color: #d1d5db;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .socials a:hover {
+      background: #DC291E;
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .socials a svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .copy {
+      text-align: center;
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 28px;
+    }
+
+    /* ========== MODAL SYSTEM ========== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 10000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      max-height: 88vh;
+      border-radius: 24px 24px 0 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      animation: slideUp 0.35s ease-out;
+      position: relative;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0.6; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-handle {
+      width: 40px;
+      height: 4px;
+      background: #d1d5db;
+      border-radius: 2px;
+      margin: 12px auto 8px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 20px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .modal-close {
+      background: #f3f4f6;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-body { padding: 20px; }
+    .modal-body p {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .modal-body h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      margin: 18px 0 8px;
+    }
+    .modal-body ul {
+      padding-left: 18px;
+      margin-bottom: 14px;
+    }
+    .modal-body li {
+      font-size: 13.5px;
+      color: #4b5563;
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+    .modal-badge {
+      display: inline-block;
+      background: #FEE2E2;
+      color: #DC291E;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+    .modal-cta {
+      display: block;
+      width: 100%;
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .modal-cta.secondary {
+      background: #f3f4f6;
+      color: #111827;
+      margin-top: 10px;
+    }
+
+    /* Expandable service cards */
+    .service-card .extra {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, margin 0.3s;
+      margin-top: 0;
+    }
+    .service-card.expanded .extra {
+      max-height: 600px;
+      margin-top: 14px;
+    }
+    .service-card .extra p {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .service-card .extra ul {
+      padding-left: 16px;
+      margin-bottom: 8px;
+    }
+    .service-card .extra li {
+      font-size: 12.5px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .service-btn {
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .service-btn:active { transform: scale(0.96); }
+
+    /* Trend cards interactive */
+    .trend-card {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .trend-card:active { transform: scale(0.98); }
+    .trend-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      z-index: 11000;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast .toast-icon { margin-right: 6px; }
+
+    /* Menu link hover */
+    .menu-sub .inner p,
+    .menu-plain {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .menu-sub .inner p:hover,
+    .menu-plain:hover { color: #DC291E; }
+
+    /* ========== MENU (same reliable version) ========== */
+    .menu-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 9999;
+      display: none;
+    }
+    .menu-overlay.open { display: block; }
+    .menu-backdrop {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+    }
+    .menu-panel {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      max-height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .menu-close {
+      padding: 16px;
+      text-align: left;
+    }
+    .menu-close button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #DC291E;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .menu-body { padding: 0 20px 40px; }
+    .menu-section {
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .menu-section > button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: none;
+      border: none;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: inherit;
+      color: #1f2937;
+      padding: 14px 0;
+      text-align: left;
+      cursor: pointer;
+    }
+    .menu-section > button.active { color: #DC291E; }
+    .menu-sub {
+      display: none;
+      padding-bottom: 8px;
+    }
+    .menu-sub.show { display: block; }
+    .menu-sub button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      background: none;
+      border: none;
+      font-size: 14px;
+      font-family: inherit;
+      color: #374151;
+      padding: 10px 0 10px 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .menu-sub .inner {
+      padding-left: 24px;
+      padding-bottom: 12px;
+    }
+    .menu-sub .inner p {
+      font-size: 14px;
+      color: #4b5563;
+      margin-bottom: 10px;
+    }
+    .menu-plain {
+      border-bottom: 1px solid #f3f4f6;
+      padding: 14px 0;
+      font-size: 15px;
+      color: #1f2937;
+    }
+    .menu-location {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    .menu-search {
+      margin-top: 20px;
+      position: relative;
+    }
+    .menu-search input {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      padding: 10px 40px 10px 16px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    .menu-search span {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- HEADER -->
+    <header>
+      <div class="logo">
+        <img src="aramex-logo.png" alt="aramex">
+          </div>
+      <div class="header-btns">
+        <button onclick="location.href='login.html'">Log in</button>
+        <button onclick="location.href='signup.html'">Create an account</button>
+      </div>
+    </header>
+
+    <div class="hamburger-row">
+      <button id="openMenu">☰</button>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+      <img src="delivery-man.jpg" alt="Delivery person">
+    </section>
+
+    <!-- TRACK -->
+    <section class="track-section">
+      <h2>Track your shipment</h2>
+      <div class="track-box">
+        <div class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <input type="text" placeholder="Type your tracking number" id="trackInput">
+        <button id="trackBtn">Track</button>
+      </div>
+      <p class="track-note">
+        Separate multiple tracking numbers with a space or comma.<br>
+        <span>Advanced Tracking</span>
+      </p>
+    </section>
+
+    <!-- QUICK CARDS -->
+    <section class="quick-cards">
+<div class="quick-card red" onclick="location.href='ship.html'">
+          <h3>Send Shipment</h3>
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+          </svg>
+        </div>
+        <p>Start shipping with ease. No<br>registrations required!</p>
+      </div>
+
+      <div class="quick-card white" onclick="location.href='rate-calculator.html'">
+        <h3>Rate Calculator</h3>
+        <div class="icon-wrap" style="color:#DC291E;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <p>Get instant shipping rates</p>
+      </div>
+
+      <div class="quick-card white" onclick="document.getElementById('how-can-we-help').scrollIntoView({behavior: 'smooth'})" style="cursor: pointer;">
+        <h3>Aramex Business</h3>
+        <div class="icon-wrap">
+          <img src="icons_business-enquiries.png" alt="Business" style="width:36px;height:36px;">
+        </div>
+        <p>Connect with our team to discuss your needs</p>
+      </div>
+
+     <div class="quick-card white" onclick="window.location.href='help-support.html'" style="cursor:pointer;">
+        <h3>Help and Support</h3>
+        <div class="icon-wrap">
+          <img src="supporticon.png" alt="Support" style="width:36px;height:36px;">
+        </div>
+        <p>Let's get you the right help</p>
+      </div>
+    </section>
+
+    <!-- DELIVERY UNLIMITED -->
+    <section class="unlimited">
+      <h2>Delivery unlimited</h2>
+      <div class="unlimited-item">
+        <img src="bitmap.webp" alt="Sustainable logistics">
+        <h3>Sustainable logistics</h3>
+        <p>As a premier logistics company in the UAE, we are committed to sustainable logistics, reducing environmental impact and maximizing efficiency. Our innovative solutions promote eco-friendly operations for a greener future.</p>
+      </div>
+      <div class="unlimited-item">
+        <img src="img-why@2x.webp" alt="Flexible solutions">
+        <h3>Flexible solutions</h3>
+        <p>We offer flexible logistics solutions tailored to diverse needs. From customized shipping to scalable services, we adapt to your business, ensuring seamless and efficient operations.</p>
+      </div>
+      <div class="unlimited-item">
+        <img src="img-header.webp" alt="Supply chain resilience">
+        <h3>Supply chain resilience</h3>
+        <p>Aramex enhances supply chain resilience with advanced technologies and robust strategies. Our proactive approach ensures uninterrupted operations, even amid unforeseen challenges.</p>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services">
+      <div class="service-card" data-service="express">
+        <div class="service-top">
+          <div>
+            <h3>aramex</h3>
+            <div class="service-line red"></div>
+            <p>Express</p>
+          </div>
+          <button class="service-btn red" data-expand="express">Learn more</button>
+        </div>
+        <p>Experience the speed and reliability of Aramex Express, our premier express delivery service in the UAE. With a focus on timely deliveries and exceptional service, we ensure that your urgent shipments reach their destination swiftly and securely.</p>
+        <div class="extra">
+          <p><strong>Why choose Express?</strong></p>
+          <ul>
+            <li>Next-day &amp; same-day options across major UAE cities</li>
+            <li>Real-time GPS tracking from pickup to doorstep</li>
+            <li>Temperature-controlled &amp; high-value handling</li>
+            <li>Priority customs clearance for international</li>
+          </ul>
+          <p>Ideal for e-commerce, documents, and time-critical parcels.</p>
+        </div>
+      </div>
+
+      <div class="service-card" data-service="freight">
+        <div class="service-top">
+          <div>
+            <h3>aramex</h3>
+            <div class="service-line yellow"></div>
+            <p>Freight</p>
+          </div>
+          <button class="service-btn yellow" data-expand="freight">Learn more</button>
+        </div>
+        <p>Aramex Freight offers comprehensive freight forwarding services, efficiently managing the complexities of international shipping. Our expertise in freight forwarding ensures that your goods are transported efficiently, safely, and in compliance with all regulations.</p>
+        <div class="extra">
+          <p><strong>Freight capabilities</strong></p>
+          <ul>
+            <li>Air, ocean &amp; road multimodal solutions</li>
+            <li>Full container load (FCL) &amp; less-than-container (LCL)</li>
+            <li>Dangerous goods certified handling</li>
+            <li>End-to-end visibility with digital documentation</li>
+          </ul>
+          <p>From project cargo to regular trade lanes — we scale with you.</p>
+        </div>
+      </div>
+
+      <div class="service-card" data-service="logistics">
+        <div class="service-top">
+          <div>
+            <h3>aramex</h3>
+            <div class="service-line teal"></div>
+            <p>Logistics</p>
+          </div>
+          <button class="service-btn teal" data-expand="logistics">Learn more</button>
+        </div>
+        <p>As the trusted logistics company in the UAE, Aramex provides end-to-end logistics solutions that streamline your supply chain. From warehousing and distribution to last-mile delivery, our integrated services are designed to optimize your logistics operations and drive business success.</p>
+        <div class="extra">
+          <p><strong>Logistics suite</strong></p>
+          <ul>
+            <li>Smart warehousing with WMS integration</li>
+            <li>Order fulfilment &amp; returns management</li>
+            <li>Last-mile network covering 100% UAE</li>
+            <li>Inventory analytics &amp; demand forecasting tools</li>
+          </ul>
+          <p>One partner from shelf to customer door.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOP & SHIP -->
+    <section class="shop-ship">
+      <div class="shop-badge">SHOP<span>&amp;</span>SHIP</div>
+      <h2>It's like having addresses<br>all around the world!</h2>
+      <p>Get Access to 40+ Addresses Around The Globe,<br>The World Of Online Shopping Awaits!</p>
+      <button class="btn">Sign Up</button>
+    </section>
+
+    <!-- DOWNLOAD APP -->
+    <section class="download">
+      <div class="app-icon">a</div>
+      <h2>Download the Aramex App</h2>
+      <div class="app-features">
+        <div class="app-feature">
+          <div class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <div>
+            <p>Get peace of mind</p>
+            <p>track orders in real time</p>
+          </div>
+        </div>
+        <div class="app-feature">
+          <div class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <p>Be in control</p>
+            <p>schedule shipments</p>
+          </div>
+        </div>
+        <div class="app-feature">
+          <div class="icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <div>
+            <p>Stay safe</p>
+            <p>secure, contactless payments</p>
+          </div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <p class="reviews">+100,000 reviews</p>
+      <div class="store-btns">
+        <div class="store-btn">
+          <span>▶</span>
+          <div>
+            <div class="small">GET IT ON</div>
+            <div class="big">Google Play</div>
+          </div>
+        </div>
+        <div class="store-btn">
+          <span></span>
+          <div>
+            <div class="small">Download on the</div>
+            <div class="big">App Store</div>
+          </div>
+        </div>
+        <div class="store-btn">
+          <span style="color:#ef4444;font-weight:700;font-size:11px;">HUAWEI</span>
+          <div>
+            <div class="small">Download on</div>
+            <div class="big">AppGallery</div>
+          </div>
+        </div>
+      </div>
+      <img src="group-284.webp" alt="App preview" class="app-preview">
+    </section>
+
+    <!-- GET IN TOUCH -->
+    <section class="get-touch">
+      <h2>Get In Touch</h2>
+      <div class="touch-card">
+        <img src="supporticon.png" alt="Support">
+        <h3>Customer Support</h3>
+        <p>Need help? Get updates on your<br>deliveries or report any issues.</p>
+      </div>
+      <div class="touch-card">
+        <img src="icons_business-enquiries.png" alt="Business">
+        <h3>Business Enquiries</h3>
+        <p>Let's talk business! Connect with our<br>team to discuss your needs.</p>
+      </div>
+      <div class="touch-card">
+        <img src="icons_careers.png" alt="Careers">
+        <h3>Careers</h3>
+        <p>Join our team! Explore exciting career<br>opportunities with us.</p>
+      </div>
+    </section>
+
+    <!-- LATEST TRENDS -->
+    <section class="trends">
+      <h2>The latest trends</h2>
+      <div class="trend-card" data-article="returns">
+        <img src="Optimizing-returns-management-for-better-customer-experience.jpg" alt="Returns">
+        <div class="info">
+          <h3>Optimizing returns management for better customer experience</h3>
+          <p>Aramex • August 11, 2026</p>
+        </div>
+      </div>
+      <div class="trend-card" data-article="fulfillment">
+        <img src="e-commerce-fulfillment.jpg" alt="Fulfillment">
+        <div class="info">
+          <h3>Speed up e-commerce fulfillment without spending a fortune</h3>
+          <p>Aramex • July 16, 2026</p>
+        </div>
+      </div>
+      <div class="trend-card" data-article="analytics">
+        <img src="Predictive-analytics-in-last-mile-delivery-for-SMEs.jpg" alt="Analytics">
+        <div class="info">
+          <h3>Predictive analytics in last-mile delivery for SMEs</h3>
+          <p>Aramex • June 10, 2026</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW CAN WE HELP -->
+<section class="help-form" id="how-can-we-help">
+      <h2>How can we help?</h2>
+      <p class="sub">Please select the reason for enquiry <span>*</span></p>
+
+      <div class="form-group">
+        <label>Reason for enquiry <span>*</span></label>
+        <select id="helpReason">
+          <option value="">Please select an option for your enquiry</option>
+          <option value="Customer Support">Customer Support</option>
+          <option value="Business Enquiry">Business Enquiry</option>
+          <option value="Careers">Careers</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>First Name <span>*</span></label>
+        <input type="text" id="helpFirstName" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label>Last Name <span>*</span></label>
+        <input type="text" id="helpLastName" autocomplete="family-name">
+      </div>
+      <div class="form-group">
+        <label>Contact Number <span>*</span></label>
+        <div class="phone-row">
+          <select id="helpCountryCode" style="border:1px solid #e5e7eb;border-radius:12px;padding:0 8px;background:#f9fafb;font-size:13px;font-family:inherit;max-width:150px;height:46px;">
+            <option value="+971">🇦🇪 +971</option>
+            <option value="+966">🇸🇦 +966</option>
+            <option value="+20">🇪🇬 +20</option>
+            <option value="+962">🇯🇴 +962</option>
+            <option value="+965">🇰🇼 +965</option>
+            <option value="+973">🇧🇭 +973</option>
+            <option value="+968">🇴🇲 +968</option>
+            <option value="+974">🇶🇦 +974</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+91">🇮🇳 +91</option>
+            <option value="+92">🇵🇰 +92</option>
+            <option value="+86">🇨🇳 +86</option>
+            <option value="+234">🇳🇬 +234</option>
+            <option value="+27">🇿🇦 +27</option>
+            <option value="+254">🇰🇪 +254</option>
+            <option value="+33">🇫🇷 +33</option>
+            <option value="+49">🇩🇪 +49</option>
+            <option value="+61">🇦🇺 +61</option>
+            <option value="+90">🇹🇷 +90</option>
+          </select>
+          <input type="tel" id="helpPhone" placeholder="Phone number" autocomplete="tel" style="flex:1;">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address <span>*</span></label>
+        <input type="email" id="helpEmail" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Main Service Of Interest <span>*</span></label>
+        <select id="helpService">
+          <option value="">Please select</option>
+          <option value="Express">Express</option>
+          <option value="Freight">Freight</option>
+          <option value="Logistics">Logistics</option>
+          <option value="Shop &amp; Ship">Shop &amp; Ship</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="helpMessage" rows="4" placeholder="Tell us more about your enquiry..." style="width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-size:14px;outline:none;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="helpTerms">
+        <span>I accept the <span>Terms of use</span></span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="helpMarketing">
+        <span>I consent to Aramex processing my data to send marketing material, as per the <span>Privacy policy</span></span>
+      </label>
+
+      <div class="recaptcha">
+        <input type="checkbox" id="helpCaptcha">
+        <span>I'm not a robot</span>
+        <div class="right">reCAPTCHA</div>
+      </div>
+
+      <button class="submit-btn" id="helpSubmitBtn" type="button">Get in touch</button>
+      <p id="helpFormStatus" style="text-align:center;margin-top:12px;font-size:13px;display:none;"></p>
+
+      <div class="help-image">
+        <img src="new-pardot-form-image4f309388b3f2659d9310ff0100e7fe0c.png" alt="Support team">
+      </div>
+      <div class="awards">
+        <img src="transport-amp-logistics.webp" alt="Award">
+        <img src="award-21782542415.webp" alt="Award">
+        <img src="award-5.webp" alt="Award">
+      </div>
+    </section>
+
+    <!-- FIND US -->
+    <section class="find-us">
+      <h2>Find us around<br>the world</h2>
+      <p>With our vast global network, we are always within reach. We guarantee seamless and efficient express delivery, freight forwarding, and logistics solutions no matter where you are in the world.</p>
+      <button class="btn" id="locateOfficesBtn" type="button">Locate Our Offices</button>
+      <img src="map.webp" alt="World map">
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo">
+        <img src="footer-logo.png" alt="aramex">
+      </div>
+      <div class="footer-links">
+        <div class="link-row" data-footer="useful">
+          <span>Useful Links</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerUseful">
+          <a href="#" data-modal="track-guide">Track a Shipment</a>
+          <a href="#" data-modal="rate-info">Rate Calculator</a>
+          <a href="#" data-modal="shopship-info">Shop &amp; Ship</a>
+          <a href="#" data-modal="offices">Locate Offices</a>
+        </div>
+
+        <div class="link-row" data-footer="legal">
+          <span>Legal</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerLegal">
+          <a href="#" data-modal="terms">Terms of Use</a>
+          <a href="#" data-modal="privacy">Privacy Policy</a>
+          <a href="#" data-modal="cookie">Cookie Policy</a>
+          <a href="#" data-modal="compliance">Compliance &amp; Ethics</a>
+        </div>
+
+        <div class="link-row" data-footer="connect">
+          <span>Connect</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerConnect">
+          <a href="#" data-modal="support">Customer Support</a>
+          <a href="#" data-modal="business">Business Enquiries</a>
+          <a href="#" data-modal="careers">Careers</a>
+          <a href="#" data-modal="media">Media Center</a>
+        </div>
+
+        <div class="link-row" data-footer="dev">
+          <span>Developers Center</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerDev">
+          <a href="#" data-modal="api">API Documentation</a>
+          <a href="#" data-modal="webhooks">Webhooks &amp; Events</a>
+          <a href="#" data-modal="sdk">SDKs &amp; Tools</a>
+          <a href="#" data-modal="sandbox">Sandbox Environment</a>
+        </div>
+      </div>
+      <div class="socials">
+        <a href="#" data-social="facebook" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="#" data-social="instagram" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="#" data-social="x" aria-label="X">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="#" data-social="linkedin" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="#" data-social="youtube" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="#" data-social="tiktok" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        </a>
+      </div>
+      <p class="copy">© Aramex 2026. All rights reserved.</p>
+    </footer>
+
+    <!-- MENU -->
+    <div class="menu-overlay" id="menuOverlay">
+      <div class="menu-backdrop" id="menuBackdrop"></div>
+      <div class="menu-panel">
+        <div class="menu-close">
+          <button id="closeMenu">✕</button>
+        </div>
+        <div class="menu-body">
+
+          <!-- Ship & Track -->
+          <div class="menu-section">
+            <button id="btnShipTrack">
+              <span>Ship &amp; Track</span>
+              <span id="arrowShipTrack">▼</span>
+            </button>
+            <div class="menu-sub" id="subShipTrack">
+              <button id="btnShipAndTrack">
+                <span>Ship and Track</span>
+                <span id="arrowShipAndTrack">▼</span>
+              </button>
+              <div class="inner" id="innerShipAndTrack" style="display:none;">
+                <p data-nav="send">Send a Shipment</p>
+                <p data-nav="track">Track a Shipment</p>
+                <p data-nav="freight-track">Freight Tracking</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Logistics Solutions -->
+          <div class="menu-section">
+            <button id="btnLogistics">
+              <span>Logistics Solutions</span>
+              <span id="arrowLogistics">▼</span>
+            </button>
+            <div class="menu-sub" id="subLogistics">
+              <button id="btnBusiness">
+                <span>Business Solutions</span>
+                <span id="arrowBusiness">▼</span>
+              </button>
+              <div class="inner" id="innerBusiness" style="display:none;">
+                <p data-nav="freight">Freight</p>
+                <p data-nav="express">Express Services</p>
+                <p data-nav="logistics">Logistics &amp; Warehousing</p>
+                <p data-nav="fulfilment">E-commerce Fulfilment</p>
+                <p data-nav="returns">Aramex Rapid Returns</p>
+              </div>
+
+              <button id="btnIndustry">
+                <span>Industry Solutions</span>
+                <span id="arrowIndustry">▼</span>
+              </button>
+              <div class="inner" id="innerIndustry" style="display:none;">
+                <p data-nav="industry-oil">Oil &amp; Gas</p>
+                <p data-nav="industry-chem">Chemicals &amp; Dangerous Goods</p>
+                <p data-nav="industry-fashion">Fashion &amp; Retail</p>
+                <p data-nav="industry-health">Healthcare</p>
+                <p data-nav="industry-auto">Automotive</p>
+                <p data-nav="industry-ecom">E-commerce &amp; SMEs</p>
+                <p data-nav="industry-fmcg">FMCG</p>
+              </div>
+
+              <button id="btnProducts">
+                <span>Products</span>
+                <span id="arrowProducts">▼</span>
+              </button>
+              <div class="inner" id="innerProducts" style="display:none;">
+                <p data-nav="pickup">Aramex Pickup Points</p>
+                <p data-nav="clicktoship">ClickToShip</p>
+                <p data-nav="partner">Pick &amp; Drop Partner Program</p>
+                <p data-nav="shopship">Shop &amp; Ship</p>
+                <p data-nav="franchise">Become an Aramex franchisee</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="menu-section">
+            <button id="btnContact">
+              <span>Contact</span>
+              <span id="arrowContact">▼</span>
+            </button>
+            <div class="menu-sub" id="subContact">
+              <button id="btnContactSupport">
+                <span>Contact and Support</span>
+                <span id="arrowContactSupport">▼</span>
+              </button>
+              <div class="inner" id="innerContactSupport" style="display:none;">
+                <p data-nav="office">Find Nearest Office</p>
+                <p data-nav="help">Help &amp; Support Center</p>
+                <p data-nav="faq">Frequently Asked Questions</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-plain" data-nav="careers">Careers</div>
+          <div class="menu-plain" data-nav="corporate" style="border-bottom:none;">Aramex Corporate</div>
+
+          <div class="menu-location">
+            <div>📍 United Arab Emirates ▼</div>
+            <div>🌐 English ▼</div>
+          </div>
+
+          <div class="menu-search">
+            <input type="text" placeholder="">
+            <span>🔍</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GLOBAL MODAL -->
+  <div class="modal-overlay" id="globalModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 id="modalTitle">Details</h3>
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+// ===== Supabase client =====
+var SUPABASE_URL = 'https://taivppkwclmkarhqmnuw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaXZwcGt3Y2xta2FyaHFtbnV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDUwMTQsImV4cCI6MjEwNTU4MTAxNH0.jDf89ZbDVMVdoVV6nBbJJNYkMrghghpAVuhwZgxWsOM';
+
+var supabaseClient = null;
+if (window.supabase && window.supabase.createClient) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+    // ========== MENU OPEN/CLOSE ==========
+    const menuOverlay = document.getElementById('menuOverlay');
+    document.getElementById('openMenu').addEventListener('click', () => {
+      menuOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('closeMenu').addEventListener('click', closeMenu);
+    document.getElementById('menuBackdrop').addEventListener('click', closeMenu);
+    function closeMenu() {
+      menuOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function setupToggle(btnId, subId, arrowId) {
+      const btn = document.getElementById(btnId);
+      const sub = document.getElementById(subId);
+      const arrow = document.getElementById(arrowId);
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const isOpen = sub.classList.contains('show');
+        sub.classList.toggle('show');
+        btn.classList.toggle('active');
+        if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+      });
+    }
+    setupToggle('btnShipTrack', 'subShipTrack', 'arrowShipTrack');
+    setupToggle('btnLogistics', 'subLogistics', 'arrowLogistics');
+    setupToggle('btnContact', 'subContact', 'arrowContact');
+
+    function setupInner(btnId, innerId, arrowId) {
+      const btn = document.getElementById(btnId);
+      const inner = document.getElementById(innerId);
+      const arrow = document.getElementById(arrowId);
+      if (!btn) return;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = inner.style.display === 'block';
+        inner.style.display = isOpen ? 'none' : 'block';
+        if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+      });
+    }
+    setupInner('btnShipAndTrack', 'innerShipAndTrack', 'arrowShipAndTrack');
+    setupInner('btnBusiness', 'innerBusiness', 'arrowBusiness');
+    setupInner('btnIndustry', 'innerIndustry', 'arrowIndustry');
+    setupInner('btnProducts', 'innerProducts', 'arrowProducts');
+    setupInner('btnContactSupport', 'innerContactSupport', 'arrowContactSupport');
+
+    // Track button
+    document.getElementById('trackBtn').addEventListener('click', () => {
+      const val = document.getElementById('trackInput').value.trim();
+      if (!val) return showToast('Please enter a tracking number');
+      location.href = 'track.html?code=' + encodeURIComponent(val);
+    });
+
+    // ========== MODAL SYSTEM ==========
+    const modal = document.getElementById('globalModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    function openModal(title, html) {
+      modalTitle.textContent = title;
+      modalBody.innerHTML = html;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Content library
+    const siteContent = {
+      // Articles
+      returns: {
+        title: 'Optimizing returns management',
+        html: `
+          <span class="modal-badge">Insights • Aug 11, 2026</span>
+          <p>Returns are no longer a cost centre — they are a competitive advantage. Brands that master reverse logistics win loyalty and recover value faster.</p>
+          <h4>Key takeaways</h4>
+          <ul>
+            <li>Pre-printed return labels cut processing time by 40%</li>
+            <li>AI grading of returned items improves resale rates</li>
+            <li>Same-day pickup for returns boosts customer NPS</li>
+            <li>Integration with marketplaces reduces friction</li>
+          </ul>
+          <p>Aramex Rapid Returns gives merchants a single dashboard for initiation, collection, inspection and restocking — all within the same network that delivered the original order.</p>
+          <button class="modal-cta" onclick="closeModal(); document.getElementById('how-can-we-help').scrollIntoView({behavior:'smooth'})">Talk to our returns team</button>
+        `
+      },
+      fulfillment: {
+        title: 'Speed up e-commerce fulfilment',
+        html: `
+          <span class="modal-badge">Insights • Jul 16, 2026</span>
+          <p>Speed without exploding costs is the holy grail of e-commerce operations. The answer lies in smart inventory placement and hybrid fulfilment models.</p>
+          <h4>What works in 2026</h4>
+          <ul>
+            <li>Micro-fulfilment centres near demand clusters</li>
+            <li>Dynamic slotting based on velocity data</li>
+            <li>Shared warehouse capacity for SMEs</li>
+            <li>2-hour cut-off for same-day delivery in major cities</li>
+          </ul>
+          <p>Aramex Fulfilment combines owned facilities with a partner network so you only pay for space and labour when you need it.</p>
+          <button class="modal-cta" onclick="closeModal(); document.querySelector('[data-service=logistics]').scrollIntoView({behavior:'smooth'})">Explore Logistics solutions</button>
+        `
+      },
+      analytics: {
+        title: 'Predictive analytics for SMEs',
+        html: `
+          <span class="modal-badge">Insights • Jun 10, 2026</span>
+          <p>Last-mile is the most expensive and least predictable leg. Predictive models now let even small businesses anticipate delays and re-route before customers notice.</p>
+          <h4>Practical applications</h4>
+          <ul>
+            <li>ETA accuracy improved to ±18 minutes</li>
+            <li>Proactive SMS when weather or traffic threatens</li>
+            <li>Demand forecasting for staffing drivers</li>
+            <li>Carbon scoring per delivery option</li>
+          </ul>
+          <p>These tools are available through the Aramex Business portal — no data science team required.</p>
+          <button class="modal-cta" onclick="closeModal(); document.getElementById('how-can-we-help').scrollIntoView({behavior:'smooth'})">Request a demo</button>
+        `
+      },
+
+      // Footer / legal / connect
+      terms: {
+        title: 'Terms of Use',
+        html: `
+          <p>By using Aramex digital services you agree to the following key terms:</p>
+          <ul>
+            <li>Accurate shipment information is your responsibility</li>
+            <li>Prohibited items list applies to all services</li>
+            <li>Liability limits are defined per service type</li>
+            <li>Governing law is that of the UAE</li>
+          </ul>
+          <p>Full legal text is available on request. This is a summary for quick reference.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Got it</button>
+        `
+      },
+      privacy: {
+        title: 'Privacy Policy',
+        html: `
+          <p>We collect only what is necessary to move your shipments and improve our services.</p>
+          <ul>
+            <li>Contact & address data for delivery</li>
+            <li>Tracking events and device info for security</li>
+            <li>Optional marketing preferences (you control)</li>
+          </ul>
+          <p>You can request access, correction or deletion at any time via the Help form.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Understood</button>
+        `
+      },
+      cookie: {
+        title: 'Cookie Policy',
+        html: `
+          <p>We use essential cookies for login and tracking, and analytics cookies to understand site performance. Preference cookies remember language and region.</p>
+          <p>You can manage non-essential cookies in your browser settings.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      compliance: {
+        title: 'Compliance & Ethics',
+        html: `
+          <p>Aramex operates under strict anti-bribery, trade compliance and data-protection frameworks across every market we serve.</p>
+          <ul>
+            <li>ISO 37001 Anti-Bribery certified</li>
+            <li>Regular third-party audits</li>
+            <li>Whistle-blower channel available 24/7</li>
+          </ul>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      support: {
+        title: 'Customer Support',
+        html: `
+          <p>Need help with a delivery, claim or account?</p>
+          <ul>
+            <li>Live chat inside the Aramex App</li>
+            <li>WhatsApp support for tracked shipments</li>
+            <li>Phone & email for complex cases</li>
+          </ul>
+          <button class="modal-cta" onclick="closeModal(); document.getElementById('how-can-we-help').scrollIntoView({behavior:'smooth'})">Open enquiry form</button>
+        `
+      },
+      business: {
+        title: 'Business Enquiries',
+        html: `
+          <p>Looking for volume rates, dedicated account management or custom logistics design?</p>
+          <p>Our commercial team will map a solution around your volumes, lanes and service levels.</p>
+          <button class="modal-cta" onclick="closeModal(); document.getElementById('how-can-we-help').scrollIntoView({behavior:'smooth'})">Start a conversation</button>
+        `
+      },
+      careers: {
+        title: 'Careers at Aramex',
+        html: `
+          <p>Join a team that moves millions of packages and ideas every day.</p>
+          <ul>
+            <li>Operations & last-mile roles</li>
+            <li>Technology & data science</li>
+            <li>Sales, marketing & customer success</li>
+            <li>Graduate & internship programmes</li>
+          </ul>
+          <p>Open roles are listed on our careers portal. We hire for attitude and growth mindset.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      media: {
+        title: 'Media Center',
+        html: `
+          <p>Press releases, brand assets and spokesperson requests.</p>
+          <p>For media enquiries please use the contact form and select “Other”, or email media@aramex.com.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      api: {
+        title: 'API Documentation',
+        html: `
+          <p>Build shipping, tracking and rate features directly into your platform.</p>
+          <ul>
+            <li>RESTful endpoints for create, track, cancel</li>
+            <li>Webhooks for status events</li>
+            <li>Sandbox keys available instantly</li>
+            <li>SDKs for Node, Python, PHP & .NET</li>
+          </ul>
+          <p>Full docs live at developers.aramex.com (external).</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      webhooks: {
+        title: 'Webhooks & Events',
+        html: `
+          <p>Receive real-time updates the moment a shipment changes status.</p>
+          <p>Supported events include: created, picked-up, in-transit, out-for-delivery, delivered, exception.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      sdk: {
+        title: 'SDKs & Tools',
+        html: `
+          <p>Official client libraries and Postman collections to accelerate integration.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      sandbox: {
+        title: 'Sandbox Environment',
+        html: `
+          <p>Test every API call against realistic data without creating live shipments or charges.</p>
+          <p>Request sandbox credentials through the Developers Center registration.</p>
+          <button class="modal-cta secondary" onclick="closeModal()">Close</button>
+        `
+      },
+      'track-guide': {
+        title: 'Track a Shipment',
+        html: `
+          <p>Enter one or more tracking numbers in the box at the top of the home page. Separate multiple numbers with a space or comma.</p>
+          <p>You can also use Advanced Tracking for multi-leg freight shipments.</p>
+          <button class="modal-cta" onclick="closeModal(); document.getElementById('trackInput').focus()">Go to tracking</button>
+        `
+      },
+      'rate-info': {
+        title: 'Rate Calculator',
+        html: `
+          <p>Get instant door-to-door estimates for Express, Freight and Economy services.</p>
+          <p>Rates depend on origin, destination, weight, dimensions and service level.</p>
+          <button class="modal-cta" onclick="closeModal(); location.href='rate-calculator.html'">Open calculator</button>
+        `
+      },
+      'shopship-info': {
+        title: 'Shop & Ship',
+        html: `
+          <p>Get personal addresses in the US, UK, China, UAE and 30+ other locations. Shop online, we consolidate and ship to you.</p>
+          <button class="modal-cta" onclick="closeModal(); document.querySelector('.shop-ship').scrollIntoView({behavior:'smooth'})">Learn more on page</button>
+        `
+      },
+      offices: {
+        title: 'Locate Our Offices',
+        html: `
+          <p>Aramex has service points and hubs across the UAE and the wider region.</p>
+          <p>Use the map section below or the “Find us around the world” button for the interactive locator.</p>
+          <button class="modal-cta" onclick="closeModal(); document.querySelector('.find-us').scrollIntoView({behavior:'smooth'})">View map section</button>
+        `
+      }
+    };
+
+    // ========== SERVICE EXPAND ==========
+    document.querySelectorAll('[data-expand]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.service-card');
+        const wasExpanded = card.classList.contains('expanded');
+        // close others
+        document.querySelectorAll('.service-card.expanded').forEach(c => {
+          c.classList.remove('expanded');
+          const b = c.querySelector('[data-expand]');
+          if (b) b.textContent = 'Learn more';
+        });
+        if (!wasExpanded) {
+          card.classList.add('expanded');
+          btn.textContent = 'Show less';
+        }
+      });
+    });
+
+    // ========== TREND ARTICLES ==========
+    document.querySelectorAll('[data-article]').forEach(card => {
+      card.addEventListener('click', () => {
+        const key = card.dataset.article;
+        const item = siteContent[key];
+        if (item) openModal(item.title, item.html);
+      });
+    });
+
+    // ========== FOOTER ACCORDIONS ==========
+    document.querySelectorAll('[data-footer]').forEach(row => {
+      row.addEventListener('click', () => {
+        const key = row.dataset.footer;
+        const map = { useful: 'footerUseful', legal: 'footerLegal', connect: 'footerConnect', dev: 'footerDev' };
+        const sub = document.getElementById(map[key]);
+        const isOpen = sub.classList.contains('show');
+        // close all
+        document.querySelectorAll('.footer-sub').forEach(s => s.classList.remove('show'));
+        document.querySelectorAll('.footer-links .link-row').forEach(r => r.classList.remove('open'));
+        if (!isOpen) {
+          sub.classList.add('show');
+          row.classList.add('open');
+        }
+      });
+    });
+
+    // Footer sub-links open modals
+    document.querySelectorAll('.footer-sub a[data-modal]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const key = a.dataset.modal;
+        const item = siteContent[key];
+        if (item) openModal(item.title, item.html);
+      });
+    });
+
+    // ========== NAV MENU ACTIONS ==========
+    // Scrolls to a service card and expands it (won't collapse it if it's already open)
+    function openService(name) {
+      closeMenu();
+      const card = document.querySelector('[data-service=' + name + ']');
+      if (!card) return;
+      card.scrollIntoView({behavior:'smooth'});
+      setTimeout(() => {
+        if (!card.classList.contains('expanded')) {
+          const btn = card.querySelector('[data-expand]');
+          if (btn) btn.click();
+        }
+      }, 400);
+    }
+
+    const navActions = {
+      send: () => { closeMenu(); location.href = 'ship.html'; },
+      track: () => { closeMenu(); document.getElementById('trackInput').focus(); document.querySelector('.track-section').scrollIntoView({behavior:'smooth'}); },
+      'freight-track': () => { closeMenu(); openModal('Freight Tracking', '<p>Freight tracking supports multi-leg and container movements. Enter your freight reference in the main tracking box or contact your account manager for dedicated freight visibility tools.</p><button class="modal-cta" onclick="closeModal(); document.getElementById(\'trackInput\').focus()">Try tracking</button>'); },
+      freight: () => openService('freight'),
+      express: () => openService('express'),
+      logistics: () => openService('logistics'),
+      fulfilment: () => { closeMenu(); openModal('E-commerce Fulfilment', siteContent.fulfillment.html); },
+      returns: () => { closeMenu(); openModal('Aramex Rapid Returns', siteContent.returns.html); },
+      'industry-oil': () => showIndustry('Oil & Gas'),
+      'industry-chem': () => showIndustry('Chemicals & Dangerous Goods'),
+      'industry-fashion': () => showIndustry('Fashion & Retail'),
+      'industry-health': () => showIndustry('Healthcare'),
+      'industry-auto': () => showIndustry('Automotive'),
+      'industry-ecom': () => showIndustry('E-commerce & SMEs'),
+      'industry-fmcg': () => showIndustry('FMCG'),
+      pickup: () => { closeMenu(); openModal('Aramex Pickup Points', '<p>Collect or drop off packages at hundreds of convenient locations across the UAE — retail partners, lockers and service centres.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>'); },
+      clicktoship: () => { closeMenu(); openModal('ClickToShip', '<p>Generate shipping labels, schedule pickups and print documentation in a few clicks from your browser or integrated ERP.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>'); },
+      partner: () => { closeMenu(); openModal('Pick & Drop Partner Program', '<p>Turn your retail location into an Aramex point and earn revenue from every package handled.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>'); },
+      shopship: () => { closeMenu(); document.querySelector('.shop-ship').scrollIntoView({behavior:'smooth'}); },
+      franchise: () => { closeMenu(); openModal('Become a Franchisee', '<p>Own and operate an Aramex station or last-mile territory. We provide training, systems and brand support.</p><button class="modal-cta" onclick="closeModal(); document.getElementById(\'how-can-we-help\').scrollIntoView({behavior:\'smooth\'})">Enquire now</button>'); },
+      office: () => { closeMenu(); document.querySelector('.find-us').scrollIntoView({behavior:'smooth'}); },
+      help: () => { closeMenu(); location.href = 'help-support.html'; },
+      faq: () => { closeMenu(); openModal('Frequently Asked Questions', '<p>Common topics: tracking delays, address changes, prohibited items, claims process, and account setup.</p><p>For the full searchable FAQ visit the Help & Support Centre.</p><button class="modal-cta" onclick="closeModal(); location.href=\'help-support.html\'">Go to Help Centre</button>'); },
+      careers: () => { closeMenu(); openModal(siteContent.careers.title, siteContent.careers.html); },
+      corporate: () => { closeMenu(); openModal('Aramex Corporate', '<p>Investor relations, sustainability reports, governance and group news.</p><p>Visit the corporate section of aramex.com for the latest filings and reports.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>'); }
+    };
+
+    function showIndustry(name) {
+      closeMenu();
+      openModal(name + ' Solutions', `
+        <p>Aramex designs specialised logistics programmes for the ${name} sector, covering compliance, temperature control, high-value security and time-critical delivery where required.</p>
+        <ul>
+          <li>Industry-specific packaging & handling SOPs</li>
+          <li>Regulatory documentation support</li>
+          <li>Dedicated account teams</li>
+        </ul>
+        <button class="modal-cta" onclick="closeModal(); document.getElementById('how-can-we-help').scrollIntoView({behavior:'smooth'})">Discuss your requirements</button>
+      `);
+    }
+
+    document.querySelectorAll('[data-nav]').forEach(el => {
+      el.addEventListener('click', () => {
+        const action = navActions[el.dataset.nav];
+        if (action) action();
+      });
+    });
+
+    // ========== SOCIAL TOASTS ==========
+    const socialNames = {
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      x: 'X (Twitter)',
+      linkedin: 'LinkedIn',
+      youtube: 'YouTube',
+      tiktok: 'TikTok'
+    };
+    document.querySelectorAll('[data-social]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = socialNames[el.dataset.social] || 'social';
+        showToast(`Opening Aramex on ${name}…`);
+      });
+    });
+
+    // ========== TOAST HELPER ==========
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerHTML = `<span class="toast-icon">✓</span>${msg}`;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+// ========== HOW CAN WE HELP FORM ==========
+const helpSubmitBtn = document.getElementById('helpSubmitBtn');
+
+function showFormError(msg) {
+  const statusEl = document.getElementById('helpFormStatus');
+  statusEl.style.display = 'block';
+  statusEl.style.color = '#DC291E';
+  statusEl.textContent = msg;
+  showToast(msg);
+}
+
+if (helpSubmitBtn) {
+  helpSubmitBtn.addEventListener('click', function() {
+    const reason = document.getElementById('helpReason').value.trim();
+    const firstName = document.getElementById('helpFirstName').value.trim();
+    const lastName = document.getElementById('helpLastName').value.trim();
+    const phone = document.getElementById('helpPhone').value.trim();
+    const email = document.getElementById('helpEmail').value.trim();
+    const service = document.getElementById('helpService').value.trim();
+    const message = document.getElementById('helpMessage').value.trim();
+    const terms = document.getElementById('helpTerms').checked;
+    const captcha = document.getElementById('helpCaptcha').checked;
+    const marketing = document.getElementById('helpMarketing').checked;
+    const statusEl = document.getElementById('helpFormStatus');
+    
+    // Validation
+    if (!reason) return showFormError('Please select a reason for enquiry');
+    if (!firstName) return showFormError('Please enter your first name');
+    if (!lastName) return showFormError('Please enter your last name');
+    if (!phone) return showFormError('Please enter your contact number');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showFormError('Please enter a valid email address');
+    if (!service) return showFormError('Please select a main service of interest');
+    if (!terms) return showFormError('You must accept the Terms of use');
+    if (!captcha) return showFormError('Please confirm you are not a robot');
+    
+    var entry = {
+      reason: reason,
+      first_name: firstName,
+      last_name: lastName,
+      phone: (document.getElementById('helpCountryCode') ? document.getElementById('helpCountryCode').value : '+971') + ' ' + phone,
+      email: email,
+      service: service,
+      message: message || '(No additional message)',
+      marketing: marketing,
+      status: 'new'
+    };
+    
+    if (!supabaseClient) {
+      showFormError('Connection error. Please refresh and try again.');
+      return;
+    }
+    
+    helpSubmitBtn.disabled = true;
+    helpSubmitBtn.textContent = 'Sending…';
+    
+    supabaseClient
+      .from('help_messages')
+      .insert([entry])
+      .then(function(result) {
+        helpSubmitBtn.disabled = false;
+        helpSubmitBtn.textContent = 'Submit';
+        
+        if (result.error) {
+          console.error(result.error);
+          showFormError('Could not send message. Please try again.');
+          return;
+        }
+        
+        // Success – reset form
+        document.getElementById('helpReason').value = '';
+        document.getElementById('helpFirstName').value = '';
+        document.getElementById('helpLastName').value = '';
+        document.getElementById('helpPhone').value = '';
+        document.getElementById('helpEmail').value = '';
+        document.getElementById('helpService').value = '';
+        document.getElementById('helpMessage').value = '';
+        document.getElementById('helpTerms').checked = false;
+        document.getElementById('helpMarketing').checked = false;
+        document.getElementById('helpCaptcha').checked = false;
+        
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#059669';
+        statusEl.textContent = '✓ Message sent successfully. Our team will get back to you shortly.';
+        showToast('Message sent to Aramex support');
+        setTimeout(function() { statusEl.style.display = 'none'; }, 5000);
+      });
+  });
+}
+
+    function showFormError(msg) {
+      const statusEl = document.getElementById('helpFormStatus');
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#DC291E';
+      statusEl.textContent = msg;
+      showToast(msg);
+    }
+
+    // Locate offices (simple list modal)
+    (function() {
+      var btn = document.getElementById('locateOfficesBtn');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        var offices = [
+          ['Dubai','United Arab Emirates','Sheikh Zayed Road, Al Quoz'],
+          ['Abu Dhabi','United Arab Emirates','Mussafah Industrial'],
+          ['Riyadh','Saudi Arabia','Olaya Street'],
+          ['Jeddah','Saudi Arabia','Prince Sultan Road'],
+          ['Amman','Jordan','Mecca Street'],
+          ['Cairo','Egypt','Nasr City'],
+          ['London','United Kingdom','Heathrow Cargo'],
+          ['New York','United States','JFK Airport'],
+          ['Singapore','Singapore','Changi Airfreight'],
+          ['Mumbai','India','Andheri East'],
+          ['Johannesburg','South Africa','OR Tambo'],
+          ['Nairobi','Kenya','JKIA']
+        ];
+        var html = '<p>Aramex offices worldwide:</p><div style="max-height:50vh;overflow-y:auto;">';
+        offices.forEach(function(o) {
+          html += '<div style="padding:10px 0;border-bottom:1px solid #f3f4f6;"><strong>' + o[0] + '</strong>, ' + o[1] + '<br><span style="font-size:13px;color:#6b7280;">' + o[2] + '</span></div>';
+        });
+        html += '</div><button class="modal-cta secondary" onclick="closeModal()">Close</button>';
+        openModal('Aramex Offices Worldwide', html);
+      });
+    })();
+
+  </script>
+</body>
+</html>
