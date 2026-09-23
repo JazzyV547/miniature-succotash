@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Admin Dashboard - Aramex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+      background: #f3f4f6;
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #f3f4f6;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .header-links {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    header a {
+      color: #fca5a5;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    header a:hover { color: #fff; }
+
+    .content {
+      padding: 20px 16px 48px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: #fff;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .tab.active {
+      background: #DC291E;
+      color: #fff;
+    }
+    .tab .badge-count {
+      display: inline-block;
+      background: #FEE2E2;
+      color: #DC291E;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .tab.active .badge-count {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stats.three { grid-template-columns: 1fr 1fr 1fr; }
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .stat-card .number {
+      font-size: 26px;
+      font-weight: 700;
+      color: #DC291E;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    .tool-link {
+      display: block;
+      text-align: center;
+      background: #111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 9999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      color: #4b5563;
+      font-weight: 500;
+    }
+    .filter-btn.active {
+      background: #DC291E;
+      color: #fff;
+      border-color: #DC291E;
+    }
+
+    /* Cards */
+    .shipment-card, .msg-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .shipment-card .top, .msg-card .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .tracking {
+      font-size: 15px;
+      font-weight: 700;
+      color: #DC291E;
+    }
+    .status-pill {
+      font-size: 11px;
+      background: #fef2f2;
+      color: #DC291E;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-pill.green { background: #d1fae5; color: #059669; }
+    .status-pill.gray { background: #f3f4f6; color: #6b7280; }
+    .status-pill.amber { background: #fef3c7; color: #b45309; }
+    .meta {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+    .meta strong { color: #111; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .actions button {
+      flex: 1;
+      min-width: 90px;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-view { background: #111; color: #fff; }
+    .btn-update { background: #DC291E; color: #fff; }
+    .btn-ghost { background: #f3f4f6; color: #374151; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+
+    /* Payment proof thumbnails */
+    .proof-thumb {
+      margin: 10px 0 0;
+    }
+    .proof-thumb img {
+      max-width: 100%;
+      max-height: 160px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      display: block;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .proof-thumb small {
+      display: block;
+      color: #9ca3af;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+    .proof-thumb .hint-hold {
+      color: #6b7280;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    /* Message cards */
+    .msg-card { border-left: 4px solid #e5e7eb; }
+    .msg-card.new { border-left-color: #DC291E; }
+    .msg-card.read { border-left-color: #9ca3af; }
+    .msg-card.replied { border-left-color: #059669; }
+    .msg-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+    }
+    .msg-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .msg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .msg-grid .lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    .msg-grid .val {
+      color: #374151;
+      word-break: break-word;
+    }
+    .msg-grid a { color: #DC291E; text-decoration: none; }
+    .msg-body {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: #9ca3af;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 12px;
+    }
+    .empty strong {
+      display: block;
+      color: #6b7280;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px 40px;
+      max-height: 85vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal h2 { font-size: 18px; margin-bottom: 16px; }
+    .modal .field { margin-bottom: 16px; }
+    .modal label {
+      display: block;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .modal input, .modal select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+    .modal input:focus, .modal select:focus { border-color: #DC291E; }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 9999px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-cancel { background: #e5e7eb; color: #111; }
+    .btn-save { background: #DC291E; color: #fff; }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+      gap: 12px;
+    }
+    .detail-row span:first-child { color: #6b7280; flex-shrink: 0; }
+    .detail-row span:last-child { text-align: right; word-break: break-word; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      z-index: 200;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <h1>Admin Dashboard</h1>
+      <div class="header-links">
+        <a href="index.html">← Site</a>
+        <a href="#" id="logoutBtn">Logout</a>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="tabs">
+        <button class="tab active" data-tab="shipments">Shipments</button>
+        <button class="tab" data-tab="messages">
+          Messages <span class="badge-count" id="msgBadge" style="display:none;">0</span>
+        </button>
+        <button class="tab" data-tab="pending">
+          Pending <span class="badge-count" id="pendingBadge" style="display:none;">0</span>
+        </button>
+      </div>
+
+      <!-- SHIPMENTS TAB -->
+      <div class="tab-panel active" id="panel-shipments">
+        <div class="stats">
+          <div class="stat-card">
+            <div class="number" id="totalShipments">0</div>
+            <div class="label">Total Shipments</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="todayShipments">0</div>
+            <div class="label">Today</div>
+          </div>
+        </div>
+
+        <a href="admin-tracking.html" class="tool-link">Open Advanced Tracking Tool</a>
+
+        <div class="section-title">All Shipments</div>
+        <div id="shipmentList"></div>
+        <div id="emptyShipments" class="empty" style="display:none;">
+          <strong>No shipments yet</strong>
+          Create one from the Send Shipment form.
+        </div>
+      </div>
+
+      <!-- MESSAGES TAB -->
+      <div class="tab-panel" id="panel-messages">
+        <div class="stats three">
+          <div class="stat-card">
+            <div class="number" id="statMsgNew">0</div>
+            <div class="label">New</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="statMsgTotal">0</div>
+            <div class="label">Total</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="statMsgReplied">0</div>
+            <div class="label">Replied</div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="new">New</button>
+          <button class="filter-btn" data-filter="read">Read</button>
+          <button class="filter-btn" data-filter="replied">Replied</button>
+        </div>
+
+        <div id="msgList"></div>
+        <div id="emptyMessages" class="empty" style="display:none;">
+          <strong>No messages yet</strong>
+          When someone submits "How can we help?" it will appear here.
+        </div>
+      </div>
+
+      <!-- PENDING APPROVALS TAB -->
+      <div class="tab-panel" id="panel-pending">
+        <div class="section-title">Payments waiting for review</div>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:14px;">Check the payment proof, then approve or reject. Customers only see the success message after you approve.</p>
+        <div id="pendingList"></div>
+        <div id="emptyPending" class="empty" style="display:none;">
+          <strong>Nothing to review</strong>
+          New shipment requests and payment proofs from the Track page appear here.
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <!-- View Details Modal -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal">
+      <h2 id="viewTitle">Shipment Details</h2>
+      <div id="viewContent"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('viewModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Update Modal -->
+  <div class="modal-overlay" id="updateModal">
+    <div class="modal">
+      <h2>Add Location Update</h2>
+      <input type="hidden" id="updateTracking">
+      <div class="field">
+        <label>Location *</label>
+        <input type="text" id="updateLocation" placeholder="e.g. Dubai Sorting Center">
+      </div>
+      <div class="field">
+        <label>Status *</label>
+        <select id="updateStatus">
+          <option>Picked Up</option>
+          <option>In Transit</option>
+          <option>Arrived at Hub</option>
+          <option>Out for Delivery</option>
+          <option>Delivered</option>
+          <option>Exception</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Description (optional)</label>
+        <input type="text" id="updateDesc" placeholder="Any extra note">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('updateModal')">Cancel</button>
+        <button class="btn-save" onclick="saveUpdate()">Save Update</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+
+// ===== Supabase client =====
+var SUPABASE_URL = 'https://taivppkwclmkarhqmnuw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaXZwcGt3Y2xta2FyaHFtbnV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDUwMTQsImV4cCI6MjEwNTU4MTAxNH0.jDf89ZbDVMVdoVV6nBbJJNYkMrghghpAVuhwZgxWsOM';
+
+var supabaseClient = null;
+if (window.supabase && window.supabase.createClient) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+// Auth guard
+(async function () {
+  if (!supabaseClient) {
+    alert('Supabase failed to load. Check internet and refresh.');
+    window.location.href = 'login.html';
+    return;
+  }
+  var result = await supabaseClient.auth.getSession();
+  if (!result.data.session) {
+    window.location.href = 'login.html';
+    return;
+  }
+})();
+
+document.getElementById('logoutBtn').addEventListener('click', async function (e) {
+  e.preventDefault();
+  if (supabaseClient) await supabaseClient.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function () { t.classList.remove('show'); }, 2500);
+}
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function tnOf(s) { return s.tracking_number || s.trackingNumber || ''; }
+
+var PAY_STATUS_LABELS = {
+  none: 'No payment yet',
+  awaiting: 'Awaiting payment',
+  pending: 'Proof submitted – needs review',
+  approved: 'Approved',
+  rejected: 'Rejected'
+};
+var PAY_METHOD_LABELS = {
+  gift: 'Apple Gift Card',
+  wallet: 'Crypto Wallet',
+  chat: 'WhatsApp'
+};
+function payMethodLabel(m) { return PAY_METHOD_LABELS[m] || m || '—'; }
+function isImageData(src) { return typeof src === 'string' && src.indexOf('data:image/') === 0; }
+
+function downloadProof(src, filename) {
+  if (!isImageData(src)) {
+    showToast('No image to download');
+    return;
+  }
+  filename = filename || ('payment-proof-' + Date.now() + '.jpg');
+  try {
+    var a = document.createElement('a');
+    a.href = src;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Download started');
+  } catch (err) {
+    // Fallback: open in new tab so admin can save
+    window.open(src, '_blank');
+    showToast('Opened image – long-press or save from browser');
+  }
+}
+
+function bindProofInteractions(root) {
+  root = root || document;
+  root.querySelectorAll('.proof-thumb img[data-proof-src], .proof-thumb img[src^="data:image/"]').forEach(function (img) {
+    if (img._proofBound) return;
+    img._proofBound = true;
+    var src = img.getAttribute('data-proof-src') || img.src;
+    var name = img.getAttribute('data-proof-name') || 'payment-proof.jpg';
+    var holdTimer = null;
+    var moved = false;
+
+    function clearHold() {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    }
+
+    img.addEventListener('click', function (e) {
+      // short tap handled by onclick=showProof if present
+    });
+
+    img.addEventListener('touchstart', function (e) {
+      moved = false;
+      clearHold();
+      holdTimer = setTimeout(function () {
+        holdTimer = null;
+        e.preventDefault();
+        downloadProof(src, name);
+      }, 550);
+    }, { passive: false });
+
+    img.addEventListener('touchmove', function () {
+      moved = true;
+      clearHold();
+    });
+
+    img.addEventListener('touchend', function () { clearHold(); });
+    img.addEventListener('touchcancel', function () { clearHold(); });
+
+    // Desktop: right-click or long mouse hold
+    img.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      downloadProof(src, name);
+    });
+
+    var mouseTimer = null;
+    img.addEventListener('mousedown', function (e) {
+      if (e.button !== 0) return;
+      mouseTimer = setTimeout(function () {
+        mouseTimer = null;
+        downloadProof(src, name);
+      }, 550);
+    });
+    img.addEventListener('mouseup', function () {
+      if (mouseTimer) { clearTimeout(mouseTimer); mouseTimer = null; }
+    });
+    img.addEventListener('mouseleave', function () {
+      if (mouseTimer) { clearTimeout(mouseTimer); mouseTimer = null; }
+    });
+  });
+}
+
+
+// Tabs
+document.querySelectorAll('.tab').forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ========== SHIPMENTS (Supabase) ==========
+async function loadShipments() {
+  if (!supabaseClient) return;
+  var res = await supabaseClient
+    .from('shipments')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (res.error) {
+    console.error(res.error);
+    showToast('Could not load shipments');
+    return;
+  }
+  var shipments = res.data || [];
+  var list = document.getElementById('shipmentList');
+  var empty = document.getElementById('emptyShipments');
+
+  document.getElementById('totalShipments').textContent = shipments.length;
+  var today = new Date().toDateString();
+  var todayCount = shipments.filter(function (s) {
+    try { return new Date(s.created_at).toDateString() === today; } catch (e) { return false; }
+  }).length;
+  document.getElementById('todayShipments').textContent = todayCount;
+
+  if (!shipments.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = shipments.map(function (s) {
+    var tn = tnOf(s) || '—';
+    var status = s.current_status || '—';
+    var pay = s.payment_status || 'none';
+    return '<div class="shipment-card">' +
+      '<div class="top"><div class="tracking">' + escapeHtml(tn) + '</div>' +
+      '<span class="status-pill">' + escapeHtml(status) + '</span></div>' +
+      '<div class="meta">' +
+        '<div><strong>Route:</strong> ' + escapeHtml(s.origin || '—') + ' → ' + escapeHtml(s.destination || '—') + '</div>' +
+        '<div><strong>Payment:</strong> ' + escapeHtml(PAY_STATUS_LABELS[pay] || pay) + '</div>' +
+      '</div>' +
+      '<div class="actions">' +
+        '<button class="btn-view" onclick="viewShipment(\'' + escapeHtml(tn) + '\')">View</button>' +
+        '<button class="btn-update" onclick="openUpdate(\'' + escapeHtml(tn) + '\')">Add update</button>' +
+        (s.paused
+          ? '<button class="btn-ghost" onclick="continueShipment(\'' + escapeHtml(tn) + '\')">Continue</button>'
+          : '<button class="btn-ghost" onclick="pauseShipment(\'' + escapeHtml(tn) + '\')">Pause</button>') +
+        '<button class="btn-danger" onclick="deleteShipment(\'' + escapeHtml(tn) + '\')">Delete</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+async function viewShipment(tn) {
+  if (!supabaseClient) return;
+  var res = await supabaseClient.from('shipments').select('*').eq('tracking_number', tn).maybeSingle();
+  var s = res.data;
+  if (!s) { showToast('Shipment not found'); return; }
+
+  var shipper = s.shipper || {};
+  var receiver = s.receiver || {};
+  var pkg = s.package || {};
+  var events = s.events || [];
+  var payStatus = s.payment_status || 'none';
+
+  var eventsHtml = events.map(function (e) {
+    return '<div class="detail-row"><span>' + escapeHtml(e.status || '') + '</span><span>' +
+      escapeHtml(e.location || '') + ' · ' + (e.event_time ? new Date(e.event_time).toLocaleString() : '') + '</span></div>';
+  }).join('');
+
+  var proofHtml = isImageData(s.payment_proof)
+    ? '<div class="proof-thumb"><img src="' + s.payment_proof + '" data-proof-src="' + s.payment_proof + '" data-proof-name="release-' + escapeHtml(tn) + '.jpg" onclick="showProof(\'shipment\',\'' + escapeHtml(tn) + '\')"><small>Release payment proof – tap to enlarge · hold to download</small></div>'
+    : '';
+  if (isImageData(s.ship_payment_proof)) {
+    proofHtml += '<div class="proof-thumb"><img src="' + s.ship_payment_proof + '" data-proof-src="' + s.ship_payment_proof + '" data-proof-name="ship-' + escapeHtml(tn) + '.jpg"><small>Shipping payment proof – hold to download</small></div>';
+  }
+
+  document.getElementById('viewTitle').textContent = tn;
+  document.getElementById('viewContent').innerHTML =
+    '<div class="detail-row"><span>Status</span><span>' + escapeHtml(s.current_status || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Origin</span><span>' + escapeHtml(s.origin || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Destination</span><span>' + escapeHtml(s.destination || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Shipper</span><span>' + escapeHtml(shipper.name || s.shipper_name || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Shipper Phone</span><span>' + escapeHtml(shipper.phone || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Shipper City</span><span>' + escapeHtml(shipper.city || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Receiver</span><span>' + escapeHtml(receiver.name || s.receiver_name || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Receiver Phone</span><span>' + escapeHtml(receiver.phone || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Receiver City</span><span>' + escapeHtml(receiver.city || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Package</span><span>' + escapeHtml((pkg.type || '') + (pkg.description ? ' – ' + pkg.description : '') || '—') + '</span></div>' +
+    '<div class="detail-row"><span>Weight</span><span>' + (pkg.weight != null ? escapeHtml(pkg.weight) + ' kg' : '—') + '</span></div>' +
+    '<div class="detail-row"><span>Shipping payment</span><span>' + escapeHtml(s.ship_payment_status ? (PAY_STATUS_LABELS[s.ship_payment_status] || s.ship_payment_status) + ' · ' + payMethodLabel(s.ship_payment_method) : '—') + '</span></div>' +
+    '<div class="detail-row"><span>Release payment</span><span>' + escapeHtml(PAY_STATUS_LABELS[payStatus] || payStatus) + '</span></div>' +
+    '<div class="detail-row"><span>Release method</span><span>' + escapeHtml(payMethodLabel(s.payment_method)) + '</span></div>' +
+    '<div class="detail-row"><span>Amount due</span><span>' + ((s.payment_amount != null && s.payment_amount !== '') ? 'USD ' + Number(s.payment_amount).toFixed(2) : '—') + '</span></div>' +
+    '<div class="detail-row"><span>Created</span><span>' + (s.created_at ? new Date(s.created_at).toLocaleString() : '—') + '</span></div>' +
+    proofHtml + eventsHtml;
+
+  document.getElementById('viewModal').classList.add('show');
+  bindProofInteractions(document.getElementById('viewContent'));
+}
+
+async function showProof(kind, id) {
+  if (!supabaseClient) return;
+  var src = null;
+  var fname = 'payment-proof.jpg';
+  if (kind === 'request') {
+    var r = await supabaseClient.from('shipment_requests').select('payment_proof').eq('request_id', id).maybeSingle();
+    src = r.data && r.data.payment_proof;
+    fname = 'request-' + id + '.jpg';
+  } else {
+    var s = await supabaseClient.from('shipments').select('payment_proof').eq('tracking_number', id).maybeSingle();
+    src = s.data && s.data.payment_proof;
+    fname = 'release-' + id + '.jpg';
+  }
+  if (!isImageData(src)) {
+    showToast('No proof image found');
+    return;
+  }
+  document.getElementById('viewTitle').textContent = 'Payment proof';
+  window._modalProofSrc = src;
+  window._modalProofName = fname;
+  document.getElementById('viewContent').innerHTML =
+    '<img src="' + src + '" data-proof-src="' + src + '" data-proof-name="' + fname + '" style="width:100%;border-radius:10px;-webkit-user-select:none;user-select:none;">' +
+    '<p style="font-size:12px;color:#6b7280;margin-top:10px;text-align:center;">Hold image to download, or use the button</p>' +
+    '<button type="button" class="btn-update" style="width:100%;margin-top:8px;" onclick="downloadProof(window._modalProofSrc, window._modalProofName)">Download proof</button>';
+  document.getElementById('viewModal').classList.add('show');
+  bindProofInteractions(document.getElementById('viewContent'));
+}
+
+function openUpdate(tracking) {
+  document.getElementById('updateTracking').value = tracking;
+  document.getElementById('updateLocation').value = '';
+  document.getElementById('updateDesc').value = '';
+  document.getElementById('updateModal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+async function saveUpdate() {
+  var tracking = document.getElementById('updateTracking').value;
+  var location = document.getElementById('updateLocation').value.trim();
+  var status = document.getElementById('updateStatus').value;
+  var desc = document.getElementById('updateDesc').value.trim();
+  if (!location) { showToast('Location is required'); return; }
+  if (!supabaseClient) return;
+
+  var res = await supabaseClient.from('shipments').select('*').eq('tracking_number', tracking).maybeSingle();
+  if (!res.data) { showToast('Shipment not found'); return; }
+
+  var events = res.data.events || [];
+  events.push({
+    location: location,
+    status: status,
+    description: desc,
+    event_time: new Date().toISOString()
+  });
+
+  var up = await supabaseClient.from('shipments').update({
+    events: events,
+    current_status: status,
+    paused: false
+  }).eq('tracking_number', tracking);
+
+  if (up.error) {
+    console.error(up.error);
+    showToast('Could not save update');
+    return;
+  }
+  closeModal('updateModal');
+  loadShipments();
+  showToast('Location update added');
+}
+
+async function pauseShipment(tracking) {
+  if (!supabaseClient) return;
+  var res = await supabaseClient.from('shipments').select('*').eq('tracking_number', tracking).maybeSingle();
+  if (!res.data) return;
+  var s = res.data;
+  var events = s.events || [];
+  events.push({
+    location: s.destination || s.origin || 'System',
+    status: 'Paused',
+    description: 'Shipment paused by admin',
+    event_time: new Date().toISOString()
+  });
+  var up = await supabaseClient.from('shipments').update({
+    paused: true,
+    status_before_pause: s.current_status || 'In Transit',
+    current_status: 'Paused',
+    events: events
+  }).eq('tracking_number', tracking);
+  if (up.error) { console.error(up.error); showToast('Could not pause'); return; }
+  loadShipments();
+  showToast('Shipment paused');
+  alert('Shipment paused successfully.');
+}
+
+async function continueShipment(tracking) {
+  if (!supabaseClient) return;
+  var res = await supabaseClient.from('shipments').select('*').eq('tracking_number', tracking).maybeSingle();
+  if (!res.data) return;
+  var s = res.data;
+  var resumeStatus = s.status_before_pause || 'In Transit';
+  var events = s.events || [];
+  events.push({
+    location: s.destination || s.origin || 'System',
+    status: resumeStatus,
+    description: 'Shipment resumed by admin',
+    event_time: new Date().toISOString()
+  });
+  var up = await supabaseClient.from('shipments').update({
+    paused: false,
+    current_status: resumeStatus,
+    status_before_pause: null,
+    events: events
+  }).eq('tracking_number', tracking);
+  if (up.error) { console.error(up.error); showToast('Could not continue'); return; }
+  loadShipments();
+  showToast('Shipment continued');
+  alert('Shipment continued successfully.');
+}
+
+async function approveTrackPayment(tracking) {
+  if (!supabaseClient) return;
+  var up = await supabaseClient.from('shipments').update({
+    payment_status: 'approved',
+    payment_approved_at: new Date().toISOString()
+  }).eq('tracking_number', tracking);
+  if (up.error) { console.error(up.error); showToast('Could not approve'); return; }
+  loadShipments();
+  loadPending();
+  alert('Payment approved for ' + tracking);
+  showToast('Payment approved');
+}
+
+async function rejectTrackPayment(tracking) {
+  if (!confirm('Reject the payment proof for ' + tracking + '? The customer will be asked to submit a new one.')) return;
+  if (!supabaseClient) return;
+  var up = await supabaseClient.from('shipments').update({
+    payment_status: 'rejected',
+    payment_rejected_at: new Date().toISOString(),
+    payment_proof: null
+  }).eq('tracking_number', tracking);
+  if (up.error) { console.error(up.error); showToast('Could not reject'); return; }
+  loadShipments();
+  loadPending();
+  showToast('Payment rejected');
+}
+
+async function deleteShipment(tracking) {
+  if (!confirm('Delete shipment ' + tracking + ' permanently? This cannot be undone.')) return;
+  if (!supabaseClient) return;
+  var del = await supabaseClient.from('shipments').delete().eq('tracking_number', tracking);
+  if (del.error) { console.error(del.error); showToast('Could not delete'); return; }
+  loadShipments();
+  loadPending();
+  showToast('Shipment deleted');
+  alert('Shipment deleted successfully.');
+}
+
+// ========== MESSAGES (Supabase – already working) ==========
+var msgFilter = 'all';
+
+async function loadMessages() {
+  if (!supabaseClient) return;
+  var result = await supabaseClient
+    .from('help_messages')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (result.error) {
+    console.error(result.error);
+    showToast('Could not load messages');
+    return;
+  }
+  var messages = result.data || [];
+  var newCount = messages.filter(function (m) { return m.status === 'new'; }).length;
+
+  document.getElementById('statMsgTotal').textContent = messages.length;
+  document.getElementById('statMsgNew').textContent = newCount;
+  document.getElementById('statMsgReplied').textContent = messages.filter(function (m) { return m.status === 'replied'; }).length;
+
+  var badge = document.getElementById('msgBadge');
+  if (newCount > 0) {
+    badge.textContent = newCount;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  var filtered = msgFilter === 'all' ? messages : messages.filter(function (m) { return m.status === msgFilter; });
+  var container = document.getElementById('msgList');
+  var empty = document.getElementById('emptyMessages');
+
+  if (!filtered.length) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  container.innerHTML = filtered.map(function (m) {
+    var badgeClass = m.status === 'new' ? '' : m.status === 'replied' ? 'green' : 'gray';
+    var badgeText = m.status === 'new' ? 'New' : m.status === 'replied' ? 'Replied' : 'Read';
+    var when = m.created_at ? new Date(m.created_at).toLocaleString() : '—';
+    return (
+      '<article class="msg-card ' + escapeHtml(m.status || 'new') + '">' +
+        '<div class="top">' +
+          '<div>' +
+            '<div class="msg-name">' + escapeHtml(m.first_name) + ' ' + escapeHtml(m.last_name) + '</div>' +
+            '<div class="msg-sub">' + when + ' · ' + escapeHtml(m.reason || '') + '</div>' +
+          '</div>' +
+          '<span class="status-pill ' + badgeClass + '">' + badgeText + '</span>' +
+        '</div>' +
+        '<div class="msg-grid">' +
+          '<div><div class="lbl">Email</div><div class="val"><a href="mailto:' + escapeHtml(m.email) + '">' + escapeHtml(m.email) + '</a></div></div>' +
+          '<div><div class="lbl">Phone</div><div class="val">' + escapeHtml(m.phone || '—') + '</div></div>' +
+          '<div><div class="lbl">Service</div><div class="val">' + escapeHtml(m.service || '—') + '</div></div>' +
+          '<div><div class="lbl">Marketing</div><div class="val">' + (m.marketing ? 'Yes' : 'No') + '</div></div>' +
+        '</div>' +
+        '<div class="msg-body">' + escapeHtml(m.message || '(No message)') + '</div>' +
+        '<div class="actions">' +
+          (m.status === 'new' ? '<button class="btn-view" data-msg-action="read" data-id="' + m.id + '">Mark read</button>' : '') +
+          (m.status !== 'replied' ? '<button class="btn-ghost" data-msg-action="replied" data-id="' + m.id + '">Mark replied</button>' : '') +
+          '<button class="btn-danger" data-msg-action="delete" data-id="' + m.id + '">Delete</button>' +
+        '</div>' +
+      '</article>'
+    );
+  }).join('');
+}
+
+document.getElementById('msgList').addEventListener('click', async function (e) {
+  var btn = e.target.closest('[data-msg-action]');
+  if (!btn || !supabaseClient) return;
+  var id = btn.dataset.id;
+  var action = btn.dataset.msgAction;
+
+  if (action === 'delete') {
+    if (!confirm('Delete this message?')) return;
+    var del = await supabaseClient.from('help_messages').delete().eq('id', id);
+    if (del.error) { showToast('Could not delete'); console.error(del.error); return; }
+    showToast('Message deleted');
+  } else {
+    var newStatus = action === 'read' ? 'read' : 'replied';
+    var up = await supabaseClient.from('help_messages').update({ status: newStatus }).eq('id', id);
+    if (up.error) { showToast('Could not update'); console.error(up.error); return; }
+    showToast(action === 'read' ? 'Marked as read' : 'Marked as replied');
+  }
+  loadMessages();
+});
+
+document.querySelectorAll('.filter-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    msgFilter = btn.dataset.filter;
+    loadMessages();
+  });
+});
+
+// ========== PENDING (Supabase) ==========
+async function loadPending() {
+  if (!supabaseClient) return;
+
+  var reqRes = await supabaseClient
+    .from('shipment_requests')
+    .select('*')
+    .eq('status', 'pending_approval')
+    .order('created_at', { ascending: false });
+  var requests = reqRes.data || [];
+
+  var proofRes = await supabaseClient
+    .from('shipments')
+    .select('*')
+    .eq('payment_status', 'pending')
+    .order('created_at', { ascending: false });
+  var proofs = proofRes.data || [];
+
+  var total = requests.length + proofs.length;
+  var badge = document.getElementById('pendingBadge');
+  if (badge) {
+    if (total > 0) {
+      badge.textContent = total;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  var container = document.getElementById('pendingList');
+  var empty = document.getElementById('emptyPending');
+  if (!container) return;
+
+  if (!total) {
+    container.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  var html = '';
+
+  if (requests.length) {
+    html += '<div class="section-title">New shipment requests</div>';
+    html += requests.map(function (r) {
+      var shipper = r.shipper || {};
+      var receiver = r.receiver || {};
+      var rid = r.request_id || '';
+      var proof = isImageData(r.payment_proof)
+        ? '<div class="proof-thumb"><img src="' + r.payment_proof + '" data-proof-src="' + r.payment_proof + '" data-proof-name="request-' + escapeHtml(rid) + '.jpg" onclick="showProof(\'request\',\'' + escapeHtml(rid) + '\')"><small>Tap to enlarge · hold to download</small></div>'
+        : '<div class="proof-thumb"><small>No proof image attached</small></div>';
+      return '<div class="shipment-card">' +
+        '<div class="top"><div class="tracking">' + escapeHtml(rid) + '</div>' +
+        '<div class="status-pill amber">Pending</div></div>' +
+        '<div class="meta">' +
+          '<div><strong>From:</strong> ' + escapeHtml(shipper.name || '—') + ' (' + escapeHtml(r.origin || '') + ')</div>' +
+          '<div><strong>To:</strong> ' + escapeHtml(receiver.name || '—') + ' (' + escapeHtml(r.destination || '') + ')</div>' +
+          '<div><strong>Payment method:</strong> ' + escapeHtml(payMethodLabel(r.payment_method)) + '</div>' +
+          '<div><strong>Submitted:</strong> ' + escapeHtml(r.created_at ? new Date(r.created_at).toLocaleString() : '') + '</div>' +
+        '</div>' + proof +
+        '<div class="actions">' +
+          '<button class="btn-update" onclick="approvePending(\'' + escapeHtml(rid) + '\')">Approve &amp; create tracking</button>' +
+          '<button class="btn-danger" onclick="rejectPending(\'' + escapeHtml(rid) + '\')">Reject</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  if (proofs.length) {
+    html += '<div class="section-title" style="margin-top:8px;">Payment proofs for existing shipments</div>';
+    html += proofs.map(function (s) {
+      var tn = tnOf(s) || '—';
+      var amountTxt = (s.payment_amount != null && s.payment_amount !== '') ? 'USD ' + Number(s.payment_amount).toFixed(2) : 'Not set';
+      var proof = isImageData(s.payment_proof)
+        ? '<div class="proof-thumb"><img src="' + s.payment_proof + '" data-proof-src="' + s.payment_proof + '" data-proof-name="release-' + escapeHtml(tn) + '.jpg" onclick="showProof(\'shipment\',\'' + escapeHtml(tn) + '\')"><small>Tap to enlarge · hold to download</small></div>'
+        : '<div class="proof-thumb"><small>No proof image attached</small></div>';
+      return '<div class="shipment-card">' +
+        '<div class="top"><div class="tracking">' + escapeHtml(tn) + '</div>' +
+        '<div class="status-pill amber">Payment proof</div></div>' +
+        '<div class="meta">' +
+          '<div><strong>Route:</strong> ' + escapeHtml(s.origin || '—') + ' → ' + escapeHtml(s.destination || '—') + '</div>' +
+          '<div><strong>Amount due:</strong> ' + escapeHtml(amountTxt) + '</div>' +
+          '<div><strong>Payment method:</strong> ' + escapeHtml(payMethodLabel(s.payment_method)) + '</div>' +
+          '<div><strong>Submitted:</strong> ' + escapeHtml(s.payment_submitted_at ? new Date(s.payment_submitted_at).toLocaleString() : '') + '</div>' +
+        '</div>' + proof +
+        '<div class="actions">' +
+          '<button class="btn-update" onclick="approveTrackPayment(\'' + escapeHtml(tn) + '\')">Approve payment</button>' +
+          '<button class="btn-danger" onclick="rejectTrackPayment(\'' + escapeHtml(tn) + '\')">Reject</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  container.innerHTML = html;
+  bindProofInteractions(container);
+}
+
+async function approvePending(requestId) {
+  if (!supabaseClient) return;
+  var res = await supabaseClient.from('shipment_requests').select('*').eq('request_id', requestId).maybeSingle();
+  var r = res.data;
+  if (!r) { showToast('Request not found'); return; }
+
+  var tn = 'ARX' + Math.floor(100000000 + Math.random() * 900000000);
+  var now = new Date().toISOString();
+
+  var ins = await supabaseClient.from('shipments').insert([{
+    tracking_number: tn,
+    request_id: r.request_id,
+    origin: r.origin,
+    destination: r.destination,
+    shipper: r.shipper,
+    receiver: r.receiver,
+    package: r.package,
+    current_status: 'Label Created',
+    created_at: now,
+    ship_payment_status: 'approved',
+    ship_payment_method: r.payment_method,
+    ship_payment_proof: r.payment_proof,
+    ship_payment_approved_at: now,
+    payment_status: 'none',
+    events: [{
+      location: r.origin || 'Origin',
+      status: 'Label Created',
+      description: 'Shipment created after payment approval',
+      event_time: now
+    }]
+  }]);
+
+  if (ins.error) {
+    console.error(ins.error);
+    showToast('Could not create shipment: ' + (ins.error.message || ''));
+    return;
+  }
+
+  var up = await supabaseClient.from('shipment_requests').update({
+    status: 'approved',
+    tracking_number: tn,
+    approved_at: now,
+    payment_proof: null
+  }).eq('request_id', requestId);
+
+  if (up.error) console.error(up.error);
+
+  loadPending();
+  loadShipments();
+  alert('Approved! Tracking number created: ' + tn);
+  showToast('Tracking ' + tn + ' created');
+}
+
+async function rejectPending(requestId) {
+  if (!confirm('Reject this request?')) return;
+  if (!supabaseClient) return;
+  var up = await supabaseClient.from('shipment_requests').update({
+    status: 'rejected',
+    rejected_at: new Date().toISOString()
+  }).eq('request_id', requestId);
+  if (up.error) { console.error(up.error); showToast('Could not reject'); return; }
+  loadPending();
+  alert('Request rejected.');
+  showToast('Request rejected');
+}
+
+// Init
+loadShipments();
+loadMessages();
+loadPending();
+
+function refreshAll() {
+  loadShipments();
+  loadMessages();
+  loadPending();
+}
+
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible') refreshAll();
+});
+
+setInterval(refreshAll, 10000);
+
+  </script>
+</body>
+</html>
