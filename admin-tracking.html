@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Admin – Tracking & Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Red Hat Display', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;
+    }
+    header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+    header a { color: #f87171; text-decoration: none; font-size: 13px; }
+    .card {
+      background: #1e293b; border-radius: 16px; padding: 20px;
+      margin-bottom: 16px; border: 1px solid #334155;
+    }
+    .card h2 {
+      font-size: 15px; font-weight: 600; color: #f1f5f9;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .card h2 span {
+      font-size: 11px; background: #DC291E; color: #fff;
+      padding: 2px 8px; border-radius: 9999px; font-weight: 600;
+    }
+    .field { margin-bottom: 14px; }
+    label {
+      display: block; font-size: 12px; color: #94a3b8;
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    input, select {
+      width: 100%; background: #0f172a; border: 1px solid #334155;
+      border-radius: 10px; padding: 12px 14px; font-size: 15px;
+      color: #f1f5f9; font-family: inherit; outline: none;
+    }
+    input:focus, select:focus { border-color: #DC291E; }
+    .btn {
+      width: 100%; border: none; padding: 14px; border-radius: 9999px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+      margin-top: 8px;
+    }
+    .btn-primary { background: #DC291E; color: #fff; }
+    .btn-secondary { background: #334155; color: #f1f5f9; }
+    .btn-success { background: #059669; color: #fff; }
+    .msg {
+      margin-top: 12px; padding: 12px; border-radius: 10px; font-size: 13px; display: none;
+    }
+    .msg.ok { background: #064e3b; color: #6ee7b7; display: block; }
+    .msg.err { background: #7f1d1d; color: #fecaca; display: block; }
+    .hint { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.4; }
+    .lookup-result {
+      background: #0f172a; border-radius: 10px; padding: 14px; margin-top: 12px;
+      font-size: 13px; line-height: 1.6; display: none;
+    }
+    .lookup-result.show { display: block; }
+    .lookup-result strong { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Tracking & Pricing</h1>
+      <a href="admin.html">← Dashboard</a>
+    </header>
+
+    <!-- Create / update shipment -->
+    <div class="card">
+      <h2>Create or update shipment</h2>
+      <div class="field">
+        <label>Tracking number *</label>
+        <input type="text" id="trackingNumber" placeholder="e.g. ARX123456789">
+      </div>
+      <div class="field">
+        <label>Shipper name</label>
+        <input type="text" id="shipperName">
+      </div>
+      <div class="field">
+        <label>Receiver name</label>
+        <input type="text" id="receiverName">
+      </div>
+      <div class="field">
+        <label>Origin city *</label>
+        <input type="text" id="origin" placeholder="Any city worldwide">
+      </div>
+      <div class="field">
+        <label>Destination city *</label>
+        <input type="text" id="destination" placeholder="Any city worldwide">
+      </div>
+      <div class="field">
+        <label>Current status</label>
+        <select id="currentStatus">
+          <option>Label Created</option>
+          <option>Picked Up</option>
+          <option>In Transit</option>
+          <option>Arrived at Hub</option>
+          <option>Out for Delivery</option>
+          <option>Delivered</option>
+          <option>Paused</option>
+          <option>Exception</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="upsertShipment()">Save shipment</button>
+      <p class="hint">Creates a live shipment that appears in the admin list and can be tracked on track.html worldwide.</p>
+      <div id="msgCreate" class="msg"></div>
+    </div>
+
+    <!-- Set payment amount for track page -->
+    <div class="card">
+      <h2>Set release payment amount <span>Track page</span></h2>
+      <div class="field">
+        <label>Tracking number *</label>
+        <input type="text" id="priceTracking" placeholder="Existing tracking number">
+      </div>
+      <div class="field">
+        <label>Amount due (USD) *</label>
+        <input type="number" id="priceAmount" min="0" step="0.01" placeholder="e.g. 49.99">
+      </div>
+      <button class="btn btn-success" onclick="setPaymentAmount()">Set amount on track page</button>
+      <p class="hint">This amount is shown on track.html under “Release payment”. Customer must pay before goods are released.</p>
+      <div id="msgPrice" class="msg"></div>
+    </div>
+
+    <!-- Lookup -->
+    <div class="card">
+      <h2>Lookup tracking code</h2>
+      <div class="field">
+        <label>Tracking number</label>
+        <input type="text" id="lookupTn" placeholder="Search any code">
+      </div>
+      <button class="btn btn-secondary" onclick="lookupShipment()">Search</button>
+      <div class="lookup-result" id="lookupResult"></div>
+      <div id="msgLookup" class="msg"></div>
+    </div>
+  </div>
+
+  <script>
+
+// ===== Supabase client =====
+var SUPABASE_URL = 'https://taivppkwclmkarhqmnuw.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaXZwcGt3Y2xta2FyaHFtbnV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDUwMTQsImV4cCI6MjEwNTU4MTAxNH0.jDf89ZbDVMVdoVV6nBbJJNYkMrghghpAVuhwZgxWsOM';
+
+var supabaseClient = null;
+if (window.supabase && window.supabase.createClient) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+// Auth guard
+(async function () {
+  if (!supabaseClient) {
+    alert('Supabase failed to load. Check internet and refresh.');
+    window.location.href = 'login.html';
+    return;
+  }
+  var result = await supabaseClient.auth.getSession();
+  if (!result.data.session) {
+    window.location.href = 'login.html';
+    return;
+  }
+})();
+
+function showMsg(id, text, ok) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+async function upsertShipment() {
+  var tn = document.getElementById('trackingNumber').value.trim().toUpperCase();
+  var origin = document.getElementById('origin').value.trim();
+  var destination = document.getElementById('destination').value.trim();
+  if (!tn || !origin || !destination) {
+    showMsg('msgCreate', 'Tracking number, origin and destination are required', false);
+    return;
+  }
+  if (!supabaseClient) {
+    showMsg('msgCreate', 'Supabase not ready', false);
+    return;
+  }
+
+  var shipperName = document.getElementById('shipperName').value.trim();
+  var receiverName = document.getElementById('receiverName').value.trim();
+  var status = document.getElementById('currentStatus').value;
+
+  var existing = await supabaseClient
+    .from('shipments')
+    .select('*')
+    .eq('tracking_number', tn)
+    .maybeSingle();
+
+  if (existing.error) {
+    console.error(existing.error);
+    showMsg('msgCreate', existing.error.message || 'Lookup failed', false);
+    return;
+  }
+
+  var payload = {
+    tracking_number: tn,
+    origin: origin,
+    destination: destination,
+    shipper: { name: shipperName, city: origin },
+    receiver: { name: receiverName, city: destination },
+    current_status: status,
+    paused: status === 'Paused'
+  };
+
+  if (existing.data) {
+    var up = await supabaseClient.from('shipments').update(payload).eq('tracking_number', tn);
+    if (up.error) {
+      console.error(up.error);
+      showMsg('msgCreate', up.error.message || 'Update failed', false);
+      return;
+    }
+  } else {
+    payload.created_at = new Date().toISOString();
+    payload.events = [{
+      location: origin,
+      status: 'Label Created',
+      description: 'Shipment created by admin',
+      event_time: new Date().toISOString()
+    }];
+    payload.payment_status = 'none';
+    var ins = await supabaseClient.from('shipments').insert([payload]);
+    if (ins.error) {
+      console.error(ins.error);
+      showMsg('msgCreate', ins.error.message || 'Insert failed', false);
+      return;
+    }
+  }
+
+  showMsg('msgCreate', 'Shipment saved. Tracking code ' + tn + ' is live and searchable.', true);
+  alert('Shipment saved successfully. Code: ' + tn);
+}
+
+async function setPaymentAmount() {
+  var tn = document.getElementById('priceTracking').value.trim().toUpperCase();
+  var amount = parseFloat(document.getElementById('priceAmount').value);
+  if (!tn) {
+    showMsg('msgPrice', 'Enter a tracking number', false);
+    return;
+  }
+  if (isNaN(amount) || amount < 0) {
+    showMsg('msgPrice', 'Enter a valid amount in USD', false);
+    return;
+  }
+  if (!supabaseClient) {
+    showMsg('msgPrice', 'Supabase not ready', false);
+    return;
+  }
+
+  var existing = await supabaseClient
+    .from('shipments')
+    .select('*')
+    .eq('tracking_number', tn)
+    .maybeSingle();
+
+  if (existing.error) {
+    console.error(existing.error);
+    showMsg('msgPrice', existing.error.message || 'Lookup failed', false);
+    return;
+  }
+  if (!existing.data) {
+    showMsg('msgPrice', 'Shipment not found. Create it first.', false);
+    return;
+  }
+
+  var update = { payment_amount: amount };
+  if (!existing.data.payment_status || existing.data.payment_status === 'none') {
+    update.payment_status = 'awaiting';
+  }
+
+  var up = await supabaseClient.from('shipments').update(update).eq('tracking_number', tn);
+  if (up.error) {
+    console.error(up.error);
+    showMsg('msgPrice', up.error.message || 'Update failed', false);
+    return;
+  }
+
+  showMsg('msgPrice', 'USD ' + amount.toFixed(2) + ' set for ' + tn + '. Visible on track page.', true);
+  alert('Payment amount set successfully.');
+}
+
+async function lookupShipment() {
+  var tn = document.getElementById('lookupTn').value.trim().toUpperCase();
+  var box = document.getElementById('lookupResult');
+  if (!tn) {
+    showMsg('msgLookup', 'Enter a tracking number', false);
+    box.classList.remove('show');
+    return;
+  }
+  if (!supabaseClient) {
+    showMsg('msgLookup', 'Supabase not ready', false);
+    return;
+  }
+
+  var res = await supabaseClient
+    .from('shipments')
+    .select('*')
+    .eq('tracking_number', tn)
+    .maybeSingle();
+
+  if (res.error) {
+    console.error(res.error);
+    showMsg('msgLookup', res.error.message || 'Lookup failed', false);
+    box.classList.remove('show');
+    return;
+  }
+  if (!res.data) {
+    showMsg('msgLookup', 'No shipment found for ' + tn, false);
+    box.classList.remove('show');
+    return;
+  }
+
+  var s = res.data;
+  showMsg('msgLookup', 'Found successfully', true);
+  box.classList.add('show');
+  box.innerHTML =
+    '<div><strong>Tracking:</strong> ' + (s.tracking_number || '') + '</div>' +
+    '<div><strong>Status:</strong> ' + (s.current_status || '—') + '</div>' +
+    '<div><strong>From:</strong> ' + (s.origin || '—') + ' → <strong>To:</strong> ' + (s.destination || '—') + '</div>' +
+    '<div><strong>Payment amount:</strong> ' + (s.payment_amount != null ? 'USD ' + Number(s.payment_amount).toFixed(2) : 'Not set') + '</div>' +
+    '<div><strong>Payment status:</strong> ' + (s.payment_status || 'none') + '</div>';
+  alert('Tracking code found successfully.');
+}
+
+  </script>
+</body>
+</html>
