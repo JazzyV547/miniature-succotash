@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Shipping Rates - Aramex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+    .page {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #fff;
+      position: relative;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo img { height: 24px; display: block; }
+    .logo p { font-size: 9px; color: #6b7280; margin-top: -2px; }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .header-right a {
+      background: #DC291E;
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #111;
+      cursor: pointer;
+      padding: 4px 2px;
+    }
+
+    /* Small phones: keep the header on one line */
+    @media (max-width: 400px) {
+      header { padding: 12px 10px; }
+      .header-right { gap: 5px; }
+      .header-right a { font-size: 12px; padding: 6px 10px; }
+    }
+
+    /* Hero image (ship + plane) */
+    .hero-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Content */
+    .content {
+      padding: 24px 20px 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #DC291E;
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    /* Toggle */
+    .toggle-box {
+      border: 1.5px solid #DC291E;
+      border-radius: 50px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 11px 0;
+      text-align: center;
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #fff;
+      color: #DC291E;
+      border: none;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .toggle-btn.active {
+      background: #DC291E;
+      color: #fff;
+    }
+    .toggle-btn svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* Fields */
+    .field {
+      margin-bottom: 20px;
+    }
+    .field label {
+      display: block;
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .field label .req { color: #DC291E; }
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+      background: #fff;
+      color: #111;
+    }
+    .field input:focus,
+    .field select:focus {
+      border-color: #DC291E;
+    }
+    .field input::placeholder {
+      color: #9ca3af;
+    }
+
+    .btn-calculate {
+      display: block;
+      width: 100%;
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* Result */
+    .result-box {
+      display: none;
+      margin-top: 24px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+    }
+    .result-box.show { display: block; }
+    .result-box .price {
+      font-size: 30px;
+      font-weight: 700;
+      color: #DC291E;
+      margin: 6px 0;
+    }
+    .result-box .details {
+      font-size: 13.5px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+    .result-box .note {
+      font-size: 11.5px;
+      color: #9ca3af;
+      margin-top: 10px;
+    }
+
+    /* Services */
+    .services-section {
+      margin-top: 40px;
+    }
+    .services-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #111;
+    }
+    .service-item {
+      background: #fff;
+      border: 1px solid #f3f4f6;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .service-item h3 {
+      font-size: 15.5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .service-item p {
+      font-size: 13.5px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+    .service-item a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    /* Footer - exact from video */
+    footer {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 28px 20px 40px;
+    }
+        .footer-logo { text-align: center; margin-bottom: 24px; }
+    .footer-logo img { height: 32px; }
+    .footer-tagline {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+    .footer-links {
+      border-top: 1px solid #333;
+    }
+    .footer-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #333;
+      color: #f87171;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .footer-link span {
+      color: #9ca3af;
+      font-size: 18px;
+    }
+    .socials {
+      display: flex;
+      gap: 18px;
+      margin: 22px 0 16px;
+      font-size: 18px;
+    }
+    .copyright {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* Welcome popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .popup-overlay.hidden {
+      display: none;
+    }
+    .popup {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 340px;
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+    .popup .globe {
+      font-size: 48px;
+      color: #d1d5db;
+      margin-bottom: 16px;
+    }
+    .popup h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #111;
+    }
+    .popup p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .popup .country {
+      font-size: 16px;
+      font-weight: 600;
+      color: #DC291E;
+      margin: 8px 0 16px;
+    }
+    .popup .lang {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 24px;
+    }
+    .popup .lang span {
+      color: #DC291E;
+      font-weight: 500;
+    }
+    .popup .btn-continue {
+      display: block;
+      width: 100%;
+      background: #DC291E;
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .popup .btn-change {
+      display: block;
+      width: 100%;
+      background: #e5e7eb;
+      color: #DC291E;
+      border: none;
+      padding: 13px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+  
+    .socials {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-top: 32px;
+    }
+    .socials a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      color: #d1d5db;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .socials a:hover {
+      background: #DC291E;
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .socials a svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+  
+    .footer-links .link-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #374151; padding: 14px 0; font-size: 14px; cursor: pointer;
+    }
+    .footer-links .link-row span:first-child { color: #ef4444; }
+    .footer-links .link-row span:last-child { color: #9ca3af; transition: transform 0.25s; }
+    .footer-links .link-row.open span:last-child { transform: rotate(180deg); }
+    .footer-sub { display: none; padding: 8px 0 12px 8px; border-bottom: 1px solid #374151; }
+    .footer-sub.show { display: block; }
+    .footer-sub a { display: block; color: #d1d5db; font-size: 13px; padding: 8px 0; text-decoration: none; }
+    .footer-sub a:hover { color: #fff; }
+    .copy { text-align: center; font-size: 11px; color: #6b7280; margin-top: 28px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #111827; color: #fff; padding: 12px 20px; border-radius: 9999px;
+      font-size: 13px; z-index: 20000; opacity: 0; transition: all 0.3s; white-space: nowrap; max-width: 90%;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.55); z-index: 10000;
+      display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #fff; width: 100%; max-width: 420px; max-height: 88vh;
+      border-radius: 24px 24px 0 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .modal-handle { width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; margin: 12px auto 8px; }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 20px 16px; border-bottom: 1px solid #f3f4f6; position: sticky; top: 0; background: #fff; z-index: 2;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 700; color: #111827; }
+    .modal-close {
+      background: #f3f4f6; border: none; width: 32px; height: 32px; border-radius: 50%;
+      font-size: 18px; cursor: pointer; color: #6b7280;
+    }
+    .modal-body { padding: 20px; }
+    .modal-body p { font-size: 14px; color: #4b5563; line-height: 1.6; margin-bottom: 14px; }
+    .modal-body ul { padding-left: 18px; margin-bottom: 14px; }
+    .modal-body li { font-size: 13.5px; color: #4b5563; margin-bottom: 6px; }
+    .modal-cta {
+      display: block; width: 100%; background: #DC291E; color: #fff; border: none;
+      padding: 14px; border-radius: 9999px; font-size: 15px; font-weight: 600;
+      margin-top: 12px; cursor: pointer; font-family: inherit; text-align: center;
+    }
+    .modal-cta.secondary { background: #f3f4f6; color: #111; }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <img src="aramex-logo.png" alt="aramex">
+        
+      </div>
+      <div class="header-right">
+        <a href="login.html">Log in</a>
+        <a href="signup.html">Create an account</a>
+        <!-- ========== EXACT ARAMEX NAV MENU (from video) ========== -->
+<style>
+  /* Menu Overlay */
+  .menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .menu-overlay.open {
+    display: flex;
+  }
+
+  /* Top bar when menu is open */
+  .menu-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+  }
+  .menu-top .logo img { height: 22px; }
+  .menu-top .logo p { font-size: 9px; color: #6b7280; margin-top: -2px; }
+  .menu-top-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu-top-right a {
+    background: #DC291E;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+  .menu-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #111;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+
+  /* Small phones: keep the menu top bar on one line */
+  @media (max-width: 400px) {
+    .menu-top { padding: 12px 10px; }
+    .menu-top-right { gap: 5px; }
+    .menu-top-right a { font-size: 12px; padding: 6px 10px; }
+  }
+
+  /* Menu body */
+  .menu-body {
+    padding: 8px 0 40px;
+    flex: 1;
+  }
+
+  /* Main menu items */
+  .menu-item {
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .menu-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    cursor: pointer;
+    background: #fff;
+  }
+  .menu-item-header .arrow {
+    font-size: 12px;
+    color: #6b7280;
+    transition: transform 0.2s;
+  }
+  .menu-item-header.open .arrow {
+    transform: rotate(180deg);
+  }
+
+  /* Sub menu */
+  .submenu {
+    display: none;
+    background: #fff;
+  }
+  .submenu.show {
+    display: block;
+  }
+  .submenu-item {
+    padding: 13px 20px 13px 32px;
+    font-size: 15px;
+    color: #374151;
+    cursor: pointer;
+    border-bottom: 1px solid #f9fafb;
+  }
+  .submenu-item.red {
+    color: #DC291E;
+    font-weight: 500;
+  }
+  .submenu-item:active {
+    background: #fef2f2;
+  }
+
+  /* Nested sub (level 3) */
+  .submenu-nested {
+    display: none;
+    background: #fafafa;
+  }
+  .submenu-nested.show {
+    display: block;
+  }
+  .submenu-nested .submenu-item {
+    padding-left: 48px;
+    font-size: 14.5px;
+    color: #4b5563;
+  }
+
+  /* Bottom section */
+  .menu-bottom {
+    padding: 16px 20px;
+    border-top: 1px solid #f3f4f6;
+  }
+  .menu-location,
+  .menu-lang {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 12px;
+  }
+  .menu-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 8px;
+  }
+  .menu-search input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .menu-search span {
+    color: #9ca3af;
+    font-size: 16px;
+  }
+</style>
+
+<!-- Hamburger button (in header) -->
+<button class="menu-btn" id="openMenuBtn" onclick="openMenu()">☰</button>
+
+<!-- ========== FULL MENU OVERLAY ========== -->
+<div class="menu-overlay" id="menuOverlay">
+  <!-- Top bar -->
+  <div class="menu-top">
+    <div class="logo">
+      <img src="aramex-logo.png" alt="aramex">
+      
+    </div>
+    <div class="menu-top-right">
+      <a href="login.html">Log in</a>
+      <a href="signup.html">Create an account</a>
+      <button class="menu-close" onclick="closeMenu()">✕</button>
+    </div>
+  </div>
+
+  <!-- Menu body -->
+  <div class="menu-body">
+
+    <!-- Ship & Track -->
+    <div class="menu-item">
+      <div class="menu-item-header" onclick="toggleSection(this, 'shipTrack')">
+        Ship &amp; Track
+        <span class="arrow">▼</span>
+      </div>
+      <div class="submenu" id="shipTrack">
+        <div class="submenu-item red" onclick="toggleNested(this, 'shipAndTrack')">
+          Ship and Track
+          <span style="float:right;font-size:12px;">▼</span>
+        </div>
+        <div class="submenu-nested" id="shipAndTrack">
+          <div class="submenu-item" onclick="location.href='ship.html'">Send a Shipment</div>
+          <div class="submenu-item" onclick="location.href='track.html'">Track a Shipment</div>
+          <div class="submenu-item">Freight Tracking</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logistics Solutions -->
+    <div class="menu-item">
+      <div class="menu-item-header" onclick="toggleSection(this, 'logistics')">
+        Logistics Solutions
+        <span class="arrow">▼</span>
+      </div>
+      <div class="submenu" id="logistics">
+
+        <!-- Business Solutions -->
+        <div class="submenu-item red" onclick="toggleNested(this, 'business')">
+          Business Solutions
+          <span style="float:right;font-size:12px;">▼</span>
+        </div>
+        <div class="submenu-nested" id="business">
+          <div class="submenu-item">Freight</div>
+          <div class="submenu-item">Express Services</div>
+          <div class="submenu-item">Logistics &amp; Warehousing</div>
+          <div class="submenu-item">E-commerce Fulfilment</div>
+          <div class="submenu-item">Aramex Rapid Returns</div>
+        </div>
+
+        <!-- Industry Solutions -->
+        <div class="submenu-item red" onclick="toggleNested(this, 'industry')">
+          Industry Solutions
+          <span style="float:right;font-size:12px;">▼</span>
+        </div>
+        <div class="submenu-nested" id="industry">
+          <div class="submenu-item">Oil &amp; Gas</div>
+          <div class="submenu-item">Chemicals &amp; Dangerous Goods</div>
+          <div class="submenu-item">Fashion &amp; Retail</div>
+          <div class="submenu-item">Healthcare</div>
+          <div class="submenu-item">Automotive</div>
+          <div class="submenu-item">E-commerce &amp; SMEs</div>
+          <div class="submenu-item">FMCG</div>
+        </div>
+
+        <!-- Products -->
+        <div class="submenu-item red" onclick="toggleNested(this, 'products')">
+          Products
+          <span style="float:right;font-size:12px;">▼</span>
+        </div>
+        <div class="submenu-nested" id="products">
+          <div class="submenu-item">Aramex Pickup Points</div>
+          <div class="submenu-item">ClickToShip</div>
+          <div class="submenu-item">Pick &amp; Drop Partner Program</div>
+          <div class="submenu-item">Shop &amp; Ship</div>
+          <div class="submenu-item">Become an Aramex franchisee</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="menu-item">
+      <div class="menu-item-header" onclick="toggleSection(this, 'contact')">
+        Contact
+        <span class="arrow">▼</span>
+      </div>
+      <div class="submenu" id="contact">
+        <div class="submenu-item red" onclick="closeMenu(); location.href='help-support.html'">Contact and Support</div>
+      </div>
+    </div>
+
+    <!-- Careers -->
+    <div class="menu-item">
+      <div class="menu-item-header" onclick="closeMenu(); openModal('Careers at Aramex','<p>Join operations, technology, sales and graduate programmes.</p><button class=\'modal-cta secondary\' onclick=\'closeModal()\'>Close</button>')">
+        Careers
+      </div>
+    </div>
+
+    <!-- Aramex Corporate -->
+    <div class="menu-item">
+      <div class="menu-item-header" onclick="closeMenu(); openModal('Aramex Corporate','<p>Investor relations, sustainability and group news.</p><button class=\'modal-cta secondary\' onclick=\'closeModal()\'>Close</button>')">
+        Aramex Corporate
+      </div>
+    </div>
+
+    <!-- Location + Language + Search -->
+    <div class="menu-bottom">
+      <div class="menu-location">
+        📍 United Arab Emirates <span style="font-size:11px;">▼</span>
+      </div>
+      <div class="menu-lang">
+        🌐 English <span style="font-size:11px;">▼</span>
+      </div>
+      <div class="menu-search">
+        <input type="text" placeholder="Search...">
+        <span>🔍</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function openMenu() {
+    document.getElementById('menuOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    document.getElementById('menuOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function toggleSection(header, id) {
+    const sub = document.getElementById(id);
+    const isOpen = sub.classList.contains('show');
+    
+    // close all other top-level
+    document.querySelectorAll('.submenu').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.menu-item-header').forEach(el => el.classList.remove('open'));
+
+    if (!isOpen) {
+      sub.classList.add('show');
+      header.classList.add('open');
+    }
+  }
+
+  function toggleNested(item, id) {
+    const nested = document.getElementById(id);
+    nested.classList.toggle('show');
+    
+    // rotate arrow
+    const arrow = item.querySelector('span');
+    if (arrow) {
+      arrow.textContent = nested.classList.contains('show') ? '▲' : '▼';
+    }
+  }
+</script>
+      </div>
+    </header>
+
+    <!-- Hero image (ship + plane) - matches video -->
+    <img class="hero-img" src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&q=80" alt="Shipping">
+
+    <div class="content">
+      <h1>Shipping Rates</h1>
+
+      <!-- Toggle -->
+      <div class="toggle-box">
+        <button class="toggle-btn active" id="btnInternational" onclick="setType('international')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
+          </svg>
+          International
+        </button>
+        <button class="toggle-btn" id="btnDomestic" onclick="setType('domestic')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <path d="M16 8h4l3 3v5h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+          Domestic
+        </button>
+      </div>
+
+      <!-- Form fields -->
+      <div class="field">
+        <label>From <span class="req">*</span></label>
+        <input type="text" id="fromCountry" placeholder="Start typing the country name" list="countries">
+      </div>
+
+      <div class="field">
+        <label>To <span class="req">*</span></label>
+        <input type="text" id="toCountry" placeholder="Start typing the country name" list="countries">
+      </div>
+
+      <div class="field">
+        <label>Weight <span class="req">*</span></label>
+        <input type="number" id="weight" value="0" min="0.1" step="0.1">
+      </div>
+
+      <div class="field">
+        <label>Unit <span class="req">*</span></label>
+        <select id="unit">
+          <option value="kg" selected>Kg</option>
+          <option value="lb">Lb</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Shipment Type <span class="req">*</span></label>
+        <select id="shipmentType">
+          <option value="document">Document(s)</option>
+          <option value="parcel">Parcel / Non-document</option>
+        </select>
+      </div>
+
+      <button class="btn-calculate" onclick="calculateRate()">Calculate</button>
+
+      <!-- Result -->
+      <div class="result-box" id="resultBox">
+        <div style="font-size:13px; color:#6b7280;">Estimated Rate</div>
+        <div class="price" id="resultPrice">USD 0.00</div>
+        <div class="details" id="resultDetails"></div>
+        <div class="note">* This is an estimated rate. Final price may vary based on exact dimensions, remote areas, and fuel surcharges.</div>
+      </div>
+
+      <!-- Services section -->
+      <div class="services-section">
+        <h2>Choose us for your logistics needs</h2>
+
+        <div class="service-item">
+          <h3>📦 Express Delivery</h3>
+          <p>Need your packages delivered fast? <a href="index.html#services">Aramex Express</a> handles thousands of express deliveries daily, ensuring your urgent shipments reach their destination swiftly and securely.</p>
+        </div>
+
+        <div class="service-item">
+          <h3>✈️ Freight Forwarding</h3>
+          <p>Struggling with complex international shipments? Our <a href="index.html">freight services</a> simplify the process, managing all the logistics so you can focus on your business.</p>
+        </div>
+
+        <div class="service-item">
+          <h3>🏭 Logistics Solutions</h3>
+          <p>Worried about <a href="index.html">warehousing and distribution</a>? Aramex Logistics offers comprehensive solutions to streamline your supply chain, from storage to last-mile delivery.</p>
+        </div>
+
+        <div class="service-item">
+          <h3>🎧 Customer Support</h3>
+          <p>Need assistance? Our dedicated <a href="help-support.html">Customer Support</a> team is always ready to help, ensuring you get the support you need when you need it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer - exact structure from video -->
+    <footer>
+      <div class="footer-logo">
+        <img src="footer-logo.png" alt="aramex">
+      </div>
+      <div class="footer-links">
+        <div class="link-row" data-footer="useful">
+          <span>Useful Links</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerUseful">
+          <a href="#" data-modal="track-guide">Track a Shipment</a>
+          <a href="#" data-modal="rate-info">Rate Calculator</a>
+          <a href="#" data-modal="shopship-info">Shop &amp; Ship</a>
+          <a href="#" data-modal="offices">Locate Offices</a>
+        </div>
+
+        <div class="link-row" data-footer="legal">
+          <span>Legal</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerLegal">
+          <a href="#" data-modal="terms">Terms of Use</a>
+          <a href="#" data-modal="privacy">Privacy Policy</a>
+          <a href="#" data-modal="cookie">Cookie Policy</a>
+          <a href="#" data-modal="compliance">Compliance &amp; Ethics</a>
+        </div>
+
+        <div class="link-row" data-footer="connect">
+          <span>Connect</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerConnect">
+          <a href="#" data-modal="support">Customer Support</a>
+          <a href="#" data-modal="business">Business Enquiries</a>
+          <a href="#" data-modal="careers">Careers</a>
+          <a href="#" data-modal="media">Media Center</a>
+        </div>
+
+        <div class="link-row" data-footer="dev">
+          <span>Developers Center</span><span>▼</span>
+        </div>
+        <div class="footer-sub" id="footerDev">
+          <a href="#" data-modal="api">API Documentation</a>
+          <a href="#" data-modal="webhooks">Webhooks &amp; Events</a>
+          <a href="#" data-modal="sdk">SDKs &amp; Tools</a>
+          <a href="#" data-modal="sandbox">Sandbox Environment</a>
+        </div>
+      </div>
+      <div class="socials">
+        <a href="#" data-social="facebook" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="#" data-social="instagram" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="#" data-social="x" aria-label="X">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="#" data-social="linkedin" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="#" data-social="youtube" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="#" data-social="tiktok" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        </a>
+      </div>
+      <p class="copy">© Aramex 2026. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- Welcome Popup (exact from video) -->
+  <div class="popup-overlay" id="welcomePopup">
+    <div class="popup">
+      <div class="globe">🌐</div>
+      <h2>Welcome To Aramex</h2>
+      <p>Our system has detected that you are currently</p>
+      <p>located in</p>
+      <div class="country">United Arab Emirates</div>
+      <div class="lang">
+        Current language<br>
+        <span>English</span> &nbsp;|&nbsp; العربية
+      </div>
+      <button class="btn-continue" onclick="closePopup()">Continue</button>
+      <button class="btn-change" onclick="closePopup()">🌐 Change Country</button>
+    </div>
+  </div>
+
+  <!-- Country list -->
+  <datalist id="countries">
+    <option value="United Arab Emirates">
+    <option value="Saudi Arabia">
+    <option value="Egypt">
+    <option value="Jordan">
+    <option value="Kuwait">
+    <option value="Bahrain">
+    <option value="Oman">
+    <option value="Qatar">
+    <option value="United States">
+    <option value="United Kingdom">
+    <option value="India">
+    <option value="Pakistan">
+    <option value="China">
+    <option value="Germany">
+    <option value="France">
+    <option value="Canada">
+    <option value="Australia">
+  </datalist>
+
+  <script>
+    let currentType = 'international';
+
+    function setType(type) {
+      currentType = type;
+      document.getElementById('btnInternational').classList.toggle('active', type === 'international');
+      document.getElementById('btnDomestic').classList.toggle('active', type === 'domestic');
+      // Hide any previous estimate so it never shows the wrong shipment type
+      document.getElementById('resultBox').classList.remove('show');
+    }
+
+    let popupDismissed = false;
+
+    function closePopup() {
+      popupDismissed = true;
+      document.getElementById('welcomePopup').classList.add('hidden');
+    }
+
+    // Show popup on load (like the video)
+    window.addEventListener('load', () => {
+      // small delay so it feels natural
+      setTimeout(() => {
+        // Don't bring it back if the user already dismissed it
+        if (!popupDismissed) {
+          document.getElementById('welcomePopup').classList.remove('hidden');
+        }
+      }, 400);
+    });
+
+    function getZoneFactor(from, to, isDomestic) {
+      if (isDomestic) return 1.0;
+      const gcc = ['united arab emirates', 'saudi arabia', 'kuwait', 'bahrain', 'oman', 'qatar'];
+      const near = ['egypt', 'jordan', 'india', 'pakistan', 'lebanon', 'iraq'];
+      const far = ['united states', 'united kingdom', 'germany', 'france', 'canada', 'australia', 'china'];
+      const f = from.toLowerCase().trim();
+      const t = to.toLowerCase().trim();
+      if (gcc.includes(f) && gcc.includes(t)) return 1.3;
+      // Check "far" before "near" so e.g. India -> United States gets the far rate
+      if (far.includes(f) || far.includes(t)) return 2.6;
+      if (near.includes(f) || near.includes(t)) return 1.8;
+      return 2.2;
+    }
+
+    function calculateRate() {
+      const from = document.getElementById('fromCountry').value.trim();
+      const to = document.getElementById('toCountry').value.trim();
+      let weight = parseFloat(document.getElementById('weight').value) || 0;
+      const unit = document.getElementById('unit').value;
+      const type = document.getElementById('shipmentType').value;
+
+      if (!from || !to) {
+        alert('Please enter both From and To countries');
+        return;
+      }
+      if (weight <= 0) {
+        alert('Please enter a valid weight');
+        return;
+      }
+
+      if (unit === 'lb') weight = weight * 0.453592;
+
+      const isDomestic = currentType === 'domestic';
+      let base = isDomestic ? 35 : 85;
+      let weightCost = 0;
+
+      if (weight <= 0.5) weightCost = isDomestic ? 22 : 48;
+      else if (weight <= 1) weightCost = isDomestic ? 32 : 72;
+      else if (weight <= 2) weightCost = isDomestic ? 50 : 105;
+      else if (weight <= 5) weightCost = isDomestic ? 80 : 170;
+      else if (weight <= 10) weightCost = isDomestic ? 120 : 260;
+      else {
+        const extra = weight - 10;
+        weightCost = (isDomestic ? 120 : 260) + (extra * (isDomestic ? 11 : 22));
+      }
+
+      const typeMultiplier = type === 'document' ? 0.85 : 1.15;
+      const zoneFactor = getZoneFactor(from, to, isDomestic);
+      let total = (base + weightCost) * typeMultiplier * zoneFactor;
+      total = Math.round(total * 100) / 100;
+
+      const resultBox = document.getElementById('resultBox');
+      document.getElementById('resultPrice').textContent = 'USD ' + total.toFixed(2);
+      document.getElementById('resultDetails').innerHTML = `
+        ${from} → ${to}<br>
+        ${weight.toFixed(2)} kg • ${type === 'document' ? 'Document' : 'Parcel'} • ${isDomestic ? 'Domestic' : 'International'}
+      `;
+      resultBox.classList.add('show');
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+
+  <div class="modal-overlay" id="globalModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3 id="modalTitle">Details</h3>
+        <button class="modal-close" id="modalCloseBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+
+<script>
+  // Modal
+  var modal = document.getElementById('globalModal');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalBody = document.getElementById('modalBody');
+  function openModal(title, html) {
+    if (!modal) return;
+    modalTitle.textContent = title;
+    modalBody.innerHTML = html;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if (document.getElementById('modalCloseBtn')) {
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  }
+  if (modal) {
+    modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+  }
+
+  // Footer content (homepage-style responses)
+  var footerContent = {
+    'track-guide': { title: 'Track a Shipment', html: '<p>Enter your tracking number on the Track page for live status.</p><button class="modal-cta" onclick="closeModal(); location.href=\'track.html\'">Open tracking</button>' },
+    'rate-info': { title: 'Rate Calculator', html: '<p>You are already on the rate calculator page.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    'shopship-info': { title: 'Shop & Ship', html: '<p>Personal addresses in the US, UK, China, UAE and 30+ locations.</p><button class="modal-cta" onclick="closeModal(); location.href=\'index.html\'">Back to home</button>' },
+    offices: { title: 'Locate Our Offices', html: '<p>Find Aramex offices worldwide on the home page Find us section.</p><button class="modal-cta" onclick="closeModal(); location.href=\'index.html\'">Go to home</button>' },
+    terms: { title: 'Terms of Use', html: '<p>Accurate shipment info is your responsibility. Prohibited items list applies. Liability limits per service type.</p><button class="modal-cta secondary" onclick="closeModal()">Got it</button>' },
+    privacy: { title: 'Privacy Policy', html: '<p>We collect only what is needed to move shipments. Request access or deletion via Help.</p><button class="modal-cta secondary" onclick="closeModal()">Understood</button>' },
+    cookie: { title: 'Cookie Policy', html: '<p>Essential cookies for login and tracking; analytics for performance.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    compliance: { title: 'Compliance & Ethics', html: '<p>Anti-bribery and data-protection frameworks. ISO 37001 certified.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    support: { title: 'Customer Support', html: '<p>Live chat, WhatsApp, phone and email support.</p><button class="modal-cta" onclick="closeModal(); location.href=\'help-support.html\'">Help Centre</button>' },
+    business: { title: 'Business Enquiries', html: '<p>Volume rates and dedicated account management.</p><button class="modal-cta" onclick="closeModal(); location.href=\'help-support.html\'">Contact us</button>' },
+    careers: { title: 'Careers at Aramex', html: '<p>Operations, technology, sales and graduate programmes.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    media: { title: 'Media Center', html: '<p>Press and brand enquiries: media@aramex.com</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    api: { title: 'API Documentation', html: '<p>RESTful shipping, tracking and rate APIs with webhooks and SDKs.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    webhooks: { title: 'Webhooks & Events', html: '<p>Real-time status events including delivered and exception.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    sdk: { title: 'SDKs & Tools', html: '<p>Client libraries for Node, Python, PHP and .NET.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' },
+    sandbox: { title: 'Sandbox Environment', html: '<p>Test API calls without live shipments or charges.</p><button class="modal-cta secondary" onclick="closeModal()">Close</button>' }
+  };
+
+  document.querySelectorAll('[data-footer]').forEach(function(row) {
+    row.addEventListener('click', function() {
+      var key = row.dataset.footer;
+      var map = { useful: 'footerUseful', legal: 'footerLegal', connect: 'footerConnect', dev: 'footerDev' };
+      var sub = document.getElementById(map[key]);
+      if (!sub) return;
+      var isOpen = sub.classList.contains('show');
+      document.querySelectorAll('.footer-sub').forEach(function(s) { s.classList.remove('show'); });
+      document.querySelectorAll('.footer-links .link-row').forEach(function(r) { r.classList.remove('open'); });
+      if (!isOpen) {
+        sub.classList.add('show');
+        row.classList.add('open');
+      }
+    });
+  });
+  document.querySelectorAll('.footer-sub a[data-modal]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var item = footerContent[a.dataset.modal];
+      if (item) openModal(item.title, item.html);
+    });
+  });
+
+  // Social toasts
+  var socialNames = {
+    facebook: 'Facebook', instagram: 'Instagram', x: 'X (Twitter)',
+    linkedin: 'LinkedIn', youtube: 'YouTube', tiktok: 'TikTok'
+  };
+  document.querySelectorAll('[data-social]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      var name = socialNames[el.dataset.social] || 'social';
+      showToast('Opening Aramex on ' + name + '…');
+    });
+  });
+  function showToast(msg) {
+    var el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(function() { el.classList.remove('show'); }, 2600);
+  }
+
+</script>
+
+</body>
+</html>
